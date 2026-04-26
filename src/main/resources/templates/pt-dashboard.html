@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Membership Management | Royal Gym</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/CSS/corporate-style.css">
+  <link rel="stylesheet" href="/CSS/dashboard-styles.css">
+  <link rel="stylesheet" href="/CSS/pt-styles.css">
+  <style>
+    /* ── Page-level overrides ── */
+    .pt-main { padding: 0; }
+
+    /* ── Hero strip ── */
+    .pt-hero {
+      background: linear-gradient(135deg, rgba(10,16,32,0.95) 0%, rgba(20,38,80,0.9) 60%, rgba(10,16,32,0.95) 100%);
+      border-bottom: 1px solid rgba(245,158,11,0.2);
+      padding: 22px 0 18px;
+      margin-bottom: 26px;
+    }
+    .pt-hero-inner {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .pt-hero-left h2 {
+      font-size: 1.4rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #f0f9ff 20%, #f59e0b 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 3px;
+    }
+    .pt-hero-left p { font-size: 0.82rem; color: rgba(255,255,255,0.4); }
+
+    /* ── Mini stats bar ── */
+    .pt-stats-bar {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .pt-stat-chip {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 18px;
+      border-radius: 30px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .pt-stat-chip.gold  { background: linear-gradient(135deg,rgba(245,158,11,0.18),rgba(217,119,6,0.08)); border: 1px solid rgba(245,158,11,0.35); color: #f59e0b; }
+    .pt-stat-chip.blue  { background: linear-gradient(135deg,rgba(56,189,248,0.15),rgba(14,165,233,0.06)); border: 1px solid rgba(56,189,248,0.3);  color: #38bdf8; }
+    .pt-stat-chip.green { background: linear-gradient(135deg,rgba(16,185,129,0.15),rgba(5,150,105,0.06));  border: 1px solid rgba(16,185,129,0.3);  color: #34d399; }
+    .pt-stat-chip i { font-size: 1rem; }
+    .pt-stat-chip span { font-size: 1.1rem; }
+
+    /* ── Bento grid layout ── */
+    .pt-bento {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      grid-template-rows: auto 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+    /* Form card spans full left column height */
+    .pt-bento .pt-form-col {
+      grid-row: 1 / span 2;
+    }
+
+    /* ── Enhanced card headers ── */
+    .pt-card {
+      border-radius: 16px !important;
+      overflow: hidden;
+    }
+    .pt-card-header {
+      background: linear-gradient(90deg, rgba(245,158,11,0.08) 0%, transparent 100%) !important;
+      border-left: 3px solid #f59e0b !important;
+    }
+    .pt-section-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    /* ── Form styling upgrade ── */
+    .pt-form-grid { gap: 18px !important; }
+    #ptForm input,
+    #ptForm select {
+      background: rgba(255,255,255,0.03) !important;
+      border: 1px solid rgba(255,255,255,0.12) !important;
+      border-radius: 10px !important;
+      padding: 14px 18px !important;
+      font-size: 0.96rem !important;
+      color: #f0f9ff !important;
+      transition: all 0.3s cubic-bezier(0.4,0,0.2,1) !important;
+      backdrop-filter: blur(2px) !important;
+    }
+    #ptForm input::placeholder,
+    #ptForm select::placeholder {
+      color: rgba(255,255,255,0.35) !important;
+    }
+    #ptForm input:focus,
+    #ptForm select:focus {
+      background: rgba(255,255,255,0.05) !important;
+      border-color: rgba(56,189,248,0.5) !important;
+      box-shadow: 0 0 0 3px rgba(56,189,248,0.1), 0 0 20px rgba(56,189,248,0.15) !important;
+      color: #f0f9ff !important;
+    }
+    #ptForm select option {
+      background: #0f172a;
+      color: #f0f9ff;
+    }
+    /* ── Light mode: override dark form fields ── */
+    body.light-mode #ptForm input,
+    body.light-mode #ptForm select {
+      background: #dbeafe !important;
+      border: 1.5px solid rgba(14,165,233,0.5) !important;
+      color: #0f172a !important;
+    }
+    body.light-mode #ptForm input::placeholder { color: #64748b !important; }
+    body.light-mode #ptForm input:focus,
+    body.light-mode #ptForm select:focus {
+      background: #eff6ff !important;
+      border-color: #0ea5e9 !important;
+      box-shadow: 0 0 0 3px rgba(14,165,233,0.18) !important;
+      color: #0f172a !important;
+    }
+    body.light-mode #ptForm select option { background: #fff !important; color: #0f172a !important; }
+    body.light-mode .pt-form-group label { color: #1d4ed8 !important; font-weight: 700 !important; }
+    body.light-mode .pt-card {
+      background: #ffffff !important;
+      border: 1px solid rgba(14,165,233,0.2) !important;
+      border-top: 2px solid #f59e0b !important;
+    }
+    body.light-mode .pt-card-header {
+      background: linear-gradient(90deg, rgba(245,158,11,0.08), transparent) !important;
+      border-bottom: 1px solid rgba(14,165,233,0.12) !important;
+    }
+    body.light-mode .pt-section-title { color: #0f172a !important; }
+    /* ── Light mode: banner matches indigo header ── */
+    body.light-mode .pt-hero {
+      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 55%, #1e1b4b 100%) !important;
+      border-bottom: 1px solid rgba(167,139,250,0.3) !important;
+    }
+    body.light-mode .pt-hero-left h2 {
+      background: linear-gradient(135deg, #f0f9ff 20%, #a78bfa 100%) !important;
+      -webkit-background-clip: text !important;
+      background-clip: text !important;
+      -webkit-text-fill-color: transparent !important;
+    }
+    body.light-mode .pt-hero-left p { color: rgba(255,255,255,0.5) !important; }
+    .pt-form-actions {
+      display: flex;
+      gap: 14px;
+      margin-top: 24px;
+    }
+    .pt-btn-save {
+      flex: 1;
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #38bdf8 100%) !important;
+      border: none !important;
+      border-radius: 10px !important;
+      padding: 14px 16px !important;
+      font-weight: 700 !important;
+      font-size: 0.98rem !important;
+      color: #0c1222 !important;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4,0,0.2,1) !important;
+      box-shadow: 0 8px 24px rgba(245,158,11,0.3), 0 0 20px rgba(56,189,248,0.1) !important;
+      letter-spacing: 0.4px !important;
+    }
+    .pt-btn-save:hover {
+      transform: translateY(-3px) !important;
+      box-shadow: 0 12px 36px rgba(245,158,11,0.4), 0 0 30px rgba(56,189,248,0.2) !important;
+      background: linear-gradient(135deg, #fcd34d 0%, #f97316 50%, #60a5fa 100%) !important;
+    }
+    .pt-btn-save:active {
+      transform: translateY(-1px) !important;
+    }
+    .pt-btn-cancel {
+      background: rgba(255,255,255,0.06) !important;
+      border: 1px solid rgba(255,255,255,0.12) !important;
+      border-radius: 10px !important;
+      padding: 14px 24px !important;
+      color: rgba(255,255,255,0.75) !important;
+      font-weight: 600 !important;
+      font-size: 0.93rem !important;
+      cursor: pointer;
+      transition: all 0.3s ease !important;
+    }
+    .pt-btn-cancel:hover {
+      background: rgba(255,255,255,0.12) !important;
+      border-color: rgba(255,255,255,0.25) !important;
+      color: rgba(255,255,255,0.9) !important;
+      transform: translateY(-2px) !important;
+    }
+
+    /* ── Table upgrades ── */
+    .pt-table tbody tr {
+      transition: background 0.15s;
+    }
+    .pt-table tbody tr:hover {
+      background: linear-gradient(90deg, rgba(245,158,11,0.05), rgba(56,189,248,0.04)) !important;
+    }
+    .pt-table th {
+      background: rgba(0,0,0,0.25) !important;
+      border-bottom: 1px solid rgba(245,158,11,0.15) !important;
+    }
+
+    /* ── Action icon buttons in table ── */
+    .pt-icon-btn {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+    }
+    .pt-icon-btn.edit  { background: rgba(56,189,248,0.12); color: #38bdf8; border: 1px solid rgba(56,189,248,0.25); }
+    .pt-icon-btn.edit:hover  { background: rgba(56,189,248,0.25); transform: translateY(-1px); }
+    .pt-icon-btn.del   { background: rgba(239,68,68,0.1); color: #f87171; border: 1px solid rgba(239,68,68,0.2); }
+    .pt-icon-btn.del:hover   { background: rgba(239,68,68,0.22); transform: translateY(-1px); }
+
+    /* ── Edit banner ── */
+    .pt-edit-banner {
+      background: linear-gradient(90deg,rgba(245,158,11,0.12),transparent);
+      border-left: 3px solid #f59e0b;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 0.82rem;
+      color: #fcd34d;
+      margin-bottom: 16px;
+      display: none;
+    }
+
+    @media (max-width: 1000px) {
+      .pt-bento { grid-template-columns: 1fr; }
+      .pt-bento .pt-form-col { grid-row: auto; }
+    }
+  </style>
+</head>
+<body class="dashboard-dark">
+
+  <!-- Nav -->
+  <nav class="top-nav">
+    <div class="nav-container">
+      <div class="nav-left">
+        <h2><i class="fas fa-dumbbell"></i> Royal Gym</h2>
+      </div>
+      <div class="nav-center">
+        <span style="color:rgba(245,158,11,0.85);font-size:0.88rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;">
+          <i class="fas fa-credit-card" style="margin-right:8px;"></i>Membership Management
+        </span>
+      </div>
+      <div class="nav-right">
+        <button id="themeToggleBtn" class="icon-button" style="margin-right:8px; color:#a5b4fc;" onclick="toggleTheme()" title="Toggle Light/Dark Theme">
+          <i class="fas fa-moon"></i>
+        </button>
+        <button class="btn btn-danger" onclick="window.location.href='/admin-dashboard'">
+          <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Page Hero -->
+  <div class="pt-hero" id="adminHeroStrip" style="position:sticky;top:64px;z-index:90;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);">
+    <div class="pt-hero-inner">
+      <div class="pt-hero-left">
+        <h2><i class="fas fa-id-badge" style="-webkit-text-fill-color:#f59e0b;"></i> &nbsp;Membership Management</h2>
+        <p>Review payment requests, create packages and manage all active memberships</p>
+      </div>
+      <!-- Mini stats pills (JS will update these) -->
+      <div class="pt-stats-bar">
+        <div class="pt-stat-chip gold">
+          <i class="fas fa-bell"></i>
+          <span id="ptStatPending">—</span>
+          Pending Requests
+        </div>
+        <div class="pt-stat-chip blue">
+          <i class="fas fa-users"></i>
+          <span id="ptStatTotal">—</span>
+          Total Memberships
+        </div>
+        <div class="pt-stat-chip green">
+          <i class="fas fa-check-circle"></i>
+          <span id="ptStatActive">—</span>
+          Active
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <main class="pt-main">
+    <div class="pt-container">
+      <div class="pt-bento">
+
+        <!-- ══ LEFT: Create/Edit Form ══ -->
+        <div class="pt-form-col">
+          <div class="pt-card" id="ptFormCard">
+            <div class="pt-card-header">
+              <span class="pt-section-title">
+                <i class="fas fa-plus-circle"></i> Create Membership Package
+              </span>
+            </div>
+            <div class="pt-card-body">
+              <div class="pt-edit-banner" id="ptEditBanner">
+                <i class="fas fa-pen"></i> Edit mode — you are editing an existing membership.
+              </div>
+              <form id="ptForm" novalidate>
+                <div class="pt-form-grid">
+                  <div class="pt-form-group">
+                    <label for="ptName">Member Name <span style="color:#ef4444;">*</span></label>
+                    <input type="text" id="ptName" placeholder="e.g. John Silva" required>
+                  </div>
+                  <div class="pt-form-group">
+                    <label for="ptPlan">Plan Type</label>
+                    <select id="ptPlan">
+                      <option value="Monthly">Monthly</option>
+                      <option value="Quarterly">Quarterly</option>
+                      <option value="Annually">Annually</option>
+                    </select>
+                  </div>
+                  <div class="pt-form-group">
+                    <label for="ptStart">Start Date</label>
+                    <input type="date" id="ptStart">
+                  </div>
+                  <div class="pt-form-group">
+                    <label for="ptEnd">End Date</label>
+                    <input type="date" id="ptEnd">
+                  </div>
+                  <div class="pt-form-group">
+                    <label for="ptAmount">Amount (Rs.)</label>
+                    <input type="number" id="ptAmount" placeholder="e.g. 2500" min="0" step="0.01">
+                  </div>
+                  <div class="pt-form-group">
+                    <label for="ptStatus">Active Status</label>
+                    <select id="ptStatus">
+                      <option value="pending">Pending</option>
+                      <option value="active">Active</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="pt-form-actions">
+                  <button type="submit" class="pt-btn-save" id="ptSaveBtn">
+                    <i class="fas fa-save"></i> Save Package
+                  </button>
+                  <button type="button" class="pt-btn-cancel" id="ptCancelBtn" onclick="ptResetForm()">
+                    <i class="fas fa-times"></i> Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ RIGHT TOP: Payment Verification ══ -->
+        <div>
+          <div class="pt-card">
+            <div class="pt-card-header">
+              <span class="pt-section-title">
+                <i class="fas fa-bell"></i> Payment Verification Requests
+              </span>
+              <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                <select id="ptPayFilter" onchange="ptLoadPayments()"
+                  style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#fff;border-radius:7px;padding:6px 12px;font-size:0.84rem;cursor:pointer;">
+                  <option value="pending">Pending Only</option>
+                  <option value="all">All Payments</option>
+                </select>
+                <button class="pt-btn-refresh" onclick="ptLoadPayments()">
+                  <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+              </div>
+            </div>
+            <div class="pt-card-body">
+              <div class="pt-table-wrap">
+                <table class="pt-table">
+                  <thead>
+                    <tr>
+                      <th>Member</th>
+                      <th>Email</th>
+                      <th>Package</th>
+                      <th>Amount</th>
+                      <th>Submitted</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="ptPayBody">
+                    <tr><td colspan="7" class="pt-empty"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- ══ RIGHT BOTTOM: Current Memberships ══ -->
+          <div class="pt-card">
+            <div class="pt-card-header">
+              <span class="pt-section-title">
+                <i class="fas fa-clipboard-list"></i> Current Memberships
+              </span>
+              <button class="pt-btn-refresh" onclick="ptLoadMemberships()">
+                <i class="fas fa-sync-alt"></i> Refresh
+              </button>
+            </div>
+            <div class="pt-card-body">
+              <div class="pt-table-wrap">
+                <table class="pt-table">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Member Name</th>
+                      <th>Plan Type</th>
+                      <th>Start Date</th>
+                      <th>End Date</th>
+                      <th>Amount</th>
+                      <th>Status</th>
+                      <th>Active</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="ptMemberBody">
+                    <tr><td colspan="9" class="pt-empty"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /pt-bento -->
+    </div>
+  </main>
+
+  <!-- Toast -->
+  <div class="pt-toast" id="ptToast"></div>
+
+  <script src="/JS/custom-alerts.js"></script>
+  <script src="/JS/pt-script.js"></script>
+  <script>
+    // Update hero stats chips after memberships load
+    var _origPtLoadMemberships = ptLoadMemberships;
+    ptLoadMemberships = function() {
+      _origPtLoadMemberships();
+      fetch('/api/pt/memberships')
+        .then(function(r){ return r.json(); })
+        .then(function(data){
+          var total = data.length;
+          var active = data.filter(function(m){ return m.active; }).length;
+          var el1 = document.getElementById('ptStatTotal');
+          var el2 = document.getElementById('ptStatActive');
+          if(el1) el1.textContent = total;
+          if(el2) el2.textContent = active;
+        }).catch(function(){});
+    };
+    var _origPtLoadPayments = ptLoadPayments;
+    ptLoadPayments = function() {
+      _origPtLoadPayments();
+      fetch('/api/payment/all')
+        .then(function(r){ return r.json(); })
+        .then(function(data){
+          var pending = data.filter(function(p){ return p.status === 'PENDING'; }).length;
+          var el = document.getElementById('ptStatPending');
+          if(el) el.textContent = pending;
+        }).catch(function(){});
+    };
+  </script>
+  <script>
+    // Apply saved theme on load
+    if (localStorage.getItem('theme') === 'light') {
+      document.body.classList.add('light-mode');
+    }
+    window.addEventListener('DOMContentLoaded', () => {
+      const btn = document.getElementById('themeToggleBtn');
+      if (btn && document.body.classList.contains('light-mode')) {
+        btn.innerHTML = '<i class="fas fa-sun"></i>';
+        btn.style.color = '#fcd34d';
+        btn.style.background = 'rgba(245,158,11,0.15)';
+        btn.style.borderColor = 'rgba(245,158,11,0.4)';
+      }
+    });
+    function toggleTheme() {
+      const body = document.body;
+      const btn = document.getElementById('themeToggleBtn');
+      body.classList.toggle('light-mode');
+      if (body.classList.contains('light-mode')) {
+        localStorage.setItem('theme', 'light');
+        btn.innerHTML = '<i class="fas fa-sun"></i>';
+        btn.style.color = '#fcd34d';
+        btn.style.background = 'rgba(245,158,11,0.15)';
+        btn.style.borderColor = 'rgba(245,158,11,0.4)';
+      } else {
+        localStorage.setItem('theme', 'dark');
+        btn.innerHTML = '<i class="fas fa-moon"></i>';
+        btn.style.color = '#a5b4fc';
+        btn.style.background = 'rgba(255,255,255,0.05)';
+        btn.style.borderColor = 'rgba(255,255,255,0.08)';
+      }
+    }
+  </script>
+</body>
+</html>
+
