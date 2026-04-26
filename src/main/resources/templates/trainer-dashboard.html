@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <script>
+    (function(){
+      try {
+        var raw = localStorage.getItem('trainerUser');
+        var user = raw ? JSON.parse(raw) : null;
+        if (!user || user.role !== 'TRAINER') { window.location.replace('/login'); }
+      } catch (e) { window.location.replace('/login'); }
+    })();
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trainer Dashboard | Royal Gym</title>
+  <link rel="stylesheet" href="/CSS/corporate-style.css">
+  <link rel="stylesheet" href="/CSS/dashboard-styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* ── Hero Banner ── */
+    .trainer-hero {
+      background: linear-gradient(135deg, rgba(10,16,32,0.9) 0%, rgba(16,38,30,0.85) 60%, rgba(10,16,32,0.9) 100%);
+      border-bottom: 1px solid rgba(16,185,129,0.2);
+      padding: 28px 0 20px;
+      margin-bottom: 28px;
+    }
+    .hero-inner {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 18px;
+    }
+    .hero-title {
+      font-size: 1.7rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #f0f9ff 30%, #34d399 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 4px;
+    }
+    .hero-greeting p {
+      color: rgba(255,255,255,0.5);
+      font-size: 0.9rem;
+    }
+    .hero-badge {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .hero-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #064e3b, #022c22);
+      border: 2px solid rgba(16,185,129,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      color: #34d399;
+    }
+    .hero-membership-pill {
+      padding: 6px 18px;
+      border-radius: 30px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+    .pill-active  { background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.4); color: #34d399; }
+
+    /* ── Quick Stats Row ── */
+    .trainer-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1.2fr;
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+    .stat-mini {
+      border-radius: 16px;
+      padding: 20px 22px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      transition: transform 0.2s, box-shadow 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .stat-mini::after {
+      content: '';
+      position: absolute;
+      top: 0; right: 0;
+      width: 60px; height: 60px;
+      border-radius: 50%;
+      opacity: 0.08;
+      filter: blur(20px);
+    }
+    .stat-mini.gold-card  { background: linear-gradient(135deg,rgba(20,30,55,0.97),rgba(15,22,42,0.95)); border: 1px solid rgba(245,158,11,0.25); border-top: 2px solid rgba(245,158,11,0.7); }
+    .stat-mini.blue-card  { background: linear-gradient(135deg,rgba(14,22,50,0.97),rgba(10,18,40,0.95)); border: 1px solid rgba(56,189,248,0.2);  border-top: 2px solid rgba(56,189,248,0.6); }
+    .stat-mini.green-card { background: linear-gradient(135deg,rgba(10,25,40,0.97),rgba(8,20,35,0.95));  border: 1px solid rgba(16,185,129,0.2);  border-top: 2px solid rgba(16,185,129,0.6); }
+    .stat-mini:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(0,0,0,0.4); }
+    .stat-mini-icon {
+      width: 48px; height: 48px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem; flex-shrink: 0;
+    }
+    .stat-mini-icon.gold  { background: linear-gradient(135deg,rgba(245,158,11,0.3),rgba(217,119,6,0.15)); color: #f59e0b; box-shadow: 0 4px 14px rgba(245,158,11,0.2); }
+    .stat-mini-icon.blue  { background: linear-gradient(135deg,rgba(56,189,248,0.25),rgba(14,165,233,0.1)); color: #38bdf8; box-shadow: 0 4px 14px rgba(56,189,248,0.2); }
+    .stat-mini-icon.green { background: linear-gradient(135deg,rgba(16,185,129,0.25),rgba(5,150,105,0.1)); color: #34d399; box-shadow: 0 4px 14px rgba(16,185,129,0.2); }
+    .stat-mini-val {
+      font-size: 1.5rem; font-weight: 800; color: #f0f9ff; line-height: 1;
+      margin-bottom: 4px; letter-spacing: -0.02em;
+    }
+    .stat-mini-lbl { font-size: 0.72rem; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.07em; }
+
+    /* ── Two-column layout ── */
+    .dash-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.15fr;
+      gap: 22px;
+      align-items: start;
+    }
+
+    /* ── Icon action buttons ── */
+    .action-cards {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .action-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 9px;
+      padding: 18px 10px;
+      border-radius: 14px;
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 700;
+      transition: all 0.22s ease;
+      letter-spacing: 0.02em;
+    }
+    .action-card i { font-size: 1.3rem; }
+    .action-card.edit {
+      background: linear-gradient(135deg, rgba(56,189,248,0.22), rgba(14,165,233,0.14));
+      border: 1px solid rgba(56,189,248,0.55);
+      color: #38bdf8;
+      box-shadow: 0 4px 14px rgba(56,189,248,0.18);
+    }
+    .action-card.edit:hover {
+      background: linear-gradient(135deg, rgba(56,189,248,0.35), rgba(14,165,233,0.22));
+      border-color: rgba(56,189,248,0.8);
+      box-shadow: 0 6px 20px rgba(56,189,248,0.3);
+      transform: translateY(-3px);
+      color: #7dd3fc;
+    }
+    .action-card.password {
+      background: linear-gradient(135deg, rgba(245,158,11,0.22), rgba(217,119,6,0.14));
+      border: 1px solid rgba(245,158,11,0.55);
+      color: #f59e0b;
+      box-shadow: 0 4px 14px rgba(245,158,11,0.18);
+    }
+    .action-card.password:hover {
+      background: linear-gradient(135deg, rgba(245,158,11,0.35), rgba(217,119,6,0.22));
+      border-color: rgba(245,158,11,0.8);
+      box-shadow: 0 6px 20px rgba(245,158,11,0.3);
+      transform: translateY(-3px);
+      color: #fcd34d;
+    }
+
+    @media (max-width: 900px) {
+      .dash-grid { grid-template-columns: 1fr; }
+      .trainer-stats { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 540px) {
+      .trainer-stats { grid-template-columns: 1fr; }
+      .action-cards { grid-template-columns: 1fr; }
+    }
+
+    /* ── MODALS ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+      z-index: 1000; align-items: center; justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-content {
+      background: linear-gradient(160deg, rgba(20,30,55,0.98), rgba(12,18,35,0.98)); border: 1px solid rgba(56,189,248,0.3);
+      border-top: 3px solid #38bdf8; padding: 24px; border-radius: 12px; width: 450px; max-width: 90%;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5); position: relative;
+    }
+    .modal-content h3 { color: #f0f9ff; margin: 0 0 16px; font-size: 1.25rem; }
+    .modal-close {
+      position: absolute; top: 20px; right: 20px; background: none; border: none; color: #cbd5e1; font-size: 1.2rem;
+      cursor: pointer; transition: color 0.2s;
+    }
+    .modal-close:hover { color: #ef4444; }
+    
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 0.85rem; color: #cbd5e1; margin-bottom: 6px; font-weight: 600; }
+    .form-group input, .form-group select {
+      width: 100%; padding: 10px 14px; border-radius: 8px; background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.15); color: #fff; font-family: inherit; font-size: 0.95rem; outline: none; transition: border-color 0.2s;
+    }
+    .form-group input:focus, .form-group select:focus { border-color: transparent !important; box-shadow: none !important; }
+    .validation-error { color: #ef4444; font-size: 0.8rem; margin-top: 4px; display: none; }
+    
+    .btn-submit {
+      width: 100%; padding: 12px; border-radius: 8px; border: none; background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #0c1222; font-weight: 800; font-size: 1rem; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; margin-top: 10px;
+      box-shadow: 0 4px 16px rgba(245,158,11,0.3);
+    }
+    .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(245,158,11,0.4); }
+
+    /* ── Profile Avatar & Photo Upload ── */
+    .avatar-wrap {
+      position: relative;
+      display: inline-block;
+    }
+    .avatar-img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid rgba(16,185,129,0.5);
+      display: block;
+      cursor: pointer;
+    }
+    .avatar-letter {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      border: 2px solid rgba(16,185,129,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: #fff;
+      cursor: pointer;
+    }
+    .avatar-camera-btn {
+      position: absolute;
+      bottom: -2px;
+      right: -4px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #34d399;
+      border: 2px solid #0c1222;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.8rem;
+      color: #0c1222;
+      transition: transform 0.2s, background 0.2s;
+      z-index: 5;
+    }
+    .avatar-camera-btn:hover { transform: scale(1.2); background: #6ee7b7; }
+
+    /* ── Review cards ── */
+    .review-card {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      background: rgba(255,255,255,0.035);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 14px;
+      padding: 16px 18px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .review-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
+    .review-card .rv-body { flex:1; }
+    .review-card .rv-comment { color: rgba(255,255,255,0.75); font-size: 0.88rem; line-height: 1.55; margin: 6px 0 8px; }
+    .review-card .rv-meta { font-size: 0.72rem; color: rgba(255,255,255,0.35); display: flex; align-items: center; gap: 10px; }
+
+    /* ── Green-touch: card fields & profile items ── */
+    .profile-item label {
+      color: rgba(52,211,153,0.75);
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .profile-value {
+      border-bottom: 1px solid rgba(16,185,129,0.15);
+      padding-bottom: 4px;
+    }
+    .card-header {
+      border-left: 3px solid #34d399 !important;
+    }
+
+    /* ── Light Mode overrides ── */
+    body.light-mode .hero-greeting h1 {
+      background: none;
+      -webkit-text-fill-color: #ffffff;
+      color: #ffffff;
+    }
+    body.light-mode .hero-greeting p { color: #9ca3af !important; }
+    body.light-mode .pill-active { background: #10b981; border: 1px solid #059669; color: #fff; }
+    body.light-mode .stat-mini-lbl { color: rgba(0,0,0,0.45) !important; }
+    body.light-mode .profile-item label { color: #059669 !important; }
+    body.light-mode .profile-value { color: #0f172a !important; border-bottom-color: rgba(16,185,129,0.3) !important; }
+    body.light-mode .action-card.edit { background: linear-gradient(135deg, #dbeafe, #eff6ff) !important; border-color: #3b82f6 !important; color: #1d4ed8 !important; box-shadow: 0 4px 14px rgba(59,130,246,0.2) !important; }
+    body.light-mode .action-card.password { background: linear-gradient(135deg, #fef3c7, #fffbeb) !important; border-color: #d97706 !important; color: #92400e !important; box-shadow: 0 4px 14px rgba(217,119,6,0.2) !important; }
+  </style>
+</head>
+
+<body class="dashboard-dark">
+  <nav class="top-nav">
+    <div class="nav-container">
+      <div class="nav-left">
+        <h2><i class="fas fa-dumbbell"></i> Royal Gym</h2>
+      </div>
+      <div class="nav-center">
+        <div class="welcome-message">
+          <i class="fas fa-user-tie"></i>
+          <span id="welcomeText" style="color:rgba(255,255,255,0.7);font-size:0.95rem;">Logged in as Trainer</span>
+        </div>
+      </div>
+      <div class="nav-right">
+        <button id="themeToggleBtn" class="icon-button" style="margin-right:8px; color:#a5b4fc;" onclick="toggleTheme()" title="Toggle Light/Dark Theme">
+          <i class="fas fa-moon"></i>
+        </button>
+        <button class="btn btn-danger" onclick="logout()">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ── Hero Banner ── -->
+  <div class="trainer-hero">
+    <div class="hero-inner">
+      <div class="hero-greeting">
+        <h1 id="heroName">Welcome, Trainer!</h1>
+        <p id="heroSub">Ready to inspire some greatness today?</p>
+      </div>
+      <div class="hero-badge">
+        <div class="avatar-wrap" id="heroAvatarWrap">
+          <div class="avatar-letter" id="heroAvatarEl" style="background:#064e3b;" onclick="viewFullProfilePhoto()"><i class="fas fa-user-tie" style="font-size:1.8rem; color:#34d399;"></i></div>
+          <div class="avatar-camera-btn" onclick="document.getElementById('photoUploadInput').click()" title="Upload profile photo">
+            <i class="fas fa-camera"></i>
+          </div>
+          <input type="file" id="photoUploadInput" accept="image/*" style="display:none;" onchange="handleAvatarUpload(event)">
+        </div>
+        <span class="hero-membership-pill pill-active" id="heroPill">Active Trainer</span>
+      </div>
+    </div>
+  </div>
+
+  <main class="main-content" style="padding-top:0;">
+    <div class="container">
+      
+      <!-- Quick Stats Row -->
+      <div class="trainer-stats">
+        <div class="stat-mini gold-card">
+          <div class="stat-mini-icon gold"><i class="fas fa-calendar-check"></i></div>
+          <div>
+            <div class="stat-mini-val" id="statClasses">-</div>
+            <div class="stat-mini-lbl">Assigned Classes</div>
+          </div>
+        </div>
+        <div class="stat-mini blue-card">
+          <div class="stat-mini-icon blue"><i class="fas fa-users"></i></div>
+          <div>
+            <div class="stat-mini-val" id="statStudents">-</div>
+            <div class="stat-mini-lbl">Total Students</div>
+          </div>
+        </div>
+        <div class="stat-mini green-card">
+          <div class="stat-mini-icon green"><i class="fas fa-medal"></i></div>
+          <div>
+            <div class="stat-mini-val" id="statSpecial">-</div>
+            <div class="stat-mini-lbl">Specialization</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Two-column main area -->
+      <div class="dash-grid">
+
+        <!-- LEFT: Personal Details -->
+        <div>
+          <div class="card">
+            <div class="card-header">
+              <h3><i class="fas fa-address-card"></i> Personal Details</h3>
+            </div>
+            <div class="card-body">
+              <div class="profile-grid">
+                <div class="profile-item">
+                  <label>Full Name</label>
+                  <div class="profile-value" id="profName">-</div>
+                </div>
+                <div class="profile-item">
+                  <label>Email Address</label>
+                  <div class="profile-value" id="profEmail">-</div>
+                </div>
+                <div class="profile-item">
+                  <label>Specialization</label>
+                  <div class="profile-value" id="profSpecialization">-</div>
+                </div>
+                <div class="profile-item">
+                  <label>Age</label>
+                  <div class="profile-value" id="profAge">-</div>
+                </div>
+                <div class="profile-item">
+                  <label>Phone Number</label>
+                  <div class="profile-value" id="profPhone">-</div>
+                </div>
+                <div class="profile-item">
+                  <label>City</label>
+                  <div class="profile-value" id="profCity">-</div>
+                </div>
+                <div class="profile-item" style="grid-column: span 2;">
+                  <label>Home Address</label>
+                  <div class="profile-value" id="profAddress">-</div>
+                </div>
+              </div>
+
+              <!-- Action cards -->
+              <div class="action-cards">
+                <a href="#" onclick="openEditModal(); return false;" class="action-card edit">
+                  <i class="fas fa-edit"></i>
+                  Edit Details
+                </a>
+                <a href="#" onclick="openPassModal(); return false;" class="action-card password">
+                  <i class="fas fa-key"></i>
+                  Change Password
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: Class Schedule & Feedback -->
+        <div style="display:flex; flex-direction:column; gap:22px;">
+          
+          <div class="card">
+            <div class="card-header member-toolbar-header">
+              <h3><i class="fas fa-clock"></i> Upcoming Classes Schedule</h3>
+            </div>
+            <div class="card-body">
+              <div class="table-container">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Time</th>
+                      <th>Class Name</th>
+                      <th>Date</th>
+                      <th>Members Enrolled</th>
+                    </tr>
+                  </thead>
+                  <tbody id="scheduleTableBody">
+                    <tr><td colspan="4" style="text-align:center;color:rgba(255,255,255,0.4);padding:20px;">Loading schedule...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+
+          
+        </div>
+
+      </div><!-- /dash-grid -->
+    </div>
+  </main>
+
+  <!-- MODALS -->
+  <!-- Edit Details Modal -->
+  <div class="modal-overlay" id="editModal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeEditModal()"><i class="fas fa-times"></i></button>
+      <h3><i class="fas fa-user-edit"></i> Edit Profile</h3>
+      <form id="editForm" onsubmit="handleEditSubmit(event)" novalidate>
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="editName" required minlength="4">
+          <div class="validation-error" id="errName">Letters only, min 4 chars.</div>
+        </div>
+        <div class="form-group" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div>
+            <label>Age</label>
+            <input type="number" id="editAge" required min="18" max="70">
+            <div class="validation-error" id="errAge" style="font-size:0.7rem;">Between 18 and 100.</div>
+          </div>
+          <div>
+            <label>Phone Number</label>
+            <input type="text" id="editPhone" required pattern="[0-9]{10}">
+            <div class="validation-error" id="errPhone" style="font-size:0.7rem;">10 digit number.</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>City</label>
+          <input type="text" id="editCity" required>
+          <div class="validation-error" id="errCity">Letters only, min 2 chars.</div>
+        </div>
+        <div class="form-group">
+          <label>Home Address</label>
+          <input type="text" id="editAddress" required>
+          <div class="validation-error" id="errAddress">Min 5 chars.</div>
+        </div>
+        <button type="submit" class="btn-submit" id="btnSaveEdit" style="background: linear-gradient(135deg, #38bdf8, #0284c7); color: #fff;">Save Changes</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Change Password Modal -->
+  <div class="modal-overlay" id="passModal">
+    <div class="modal-content" style="max-width: 550px; padding: 40px;">
+      <button class="modal-close" onclick="closePassModal()"><i class="fas fa-times"></i></button>
+      <h3 class="modal-title-sync"><i class="fas fa-key"></i> Change Password</h3>
+      <form id="passForm" onsubmit="handlePassSubmit(event)" novalidate>
+        <div class="form-group">
+          <label>Current Password</label>
+          <div style="position:relative;">
+            <input type="password" id="currentPass" required style="padding-right:40px;">
+            <i class="fas fa-eye pwtoggle" onclick="togglePasswordVisibility('currentPass', this)"></i>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>New Password</label>
+          <div style="position:relative;">
+            <input type="password" id="newPass" autocomplete="new-password" placeholder="Min. 6 chars, 1 uppercase" required minlength="6" style="padding-right:40px;">
+            <i class="fas fa-eye pwtoggle" onclick="togglePasswordVisibility('newPass', this)"></i>
+          </div>
+          <div id="dashPwStrength" style="font-size:0.82rem; margin-top:6px; font-weight:600; min-height:18px; transition:color 0.3s;"></div>
+        </div>
+        <div class="form-group">
+          <label>Confirm New Password</label>
+          <div style="position:relative;">
+            <input type="password" id="confirmPass" placeholder="Repeat new password" required minlength="6" style="padding-right:40px;">
+            <i class="fas fa-eye pwtoggle" onclick="togglePasswordVisibility('confirmPass', this)"></i>
+          </div>
+          <div class="validation-error" id="matchErr">Passwords do not match.</div>
+        </div>
+        <div class="validation-error" id="passServerErr" style="margin-bottom:10px; font-size:0.9rem;"></div>
+        <button type="submit" class="btn-submit" id="btnSavePass" style="background: #0ea5e9; box-shadow: 0 4px 15px rgba(14,165,233,0.3); padding: 16px;">Update Password</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Photo View Modal -->
+  <div class="modal-overlay" id="photoViewModal">
+    <div style="position:relative; max-width:90%; max-height:90%; border-radius:12px; overflow:hidden; box-shadow:0 10px 40px rgba(0,0,0,0.8);">
+      <button class="modal-close" onclick="closePhotoViewModal()" style="position:absolute; top:10px; right:10px; background:rgba(0,0,0,0.6); color:#fff; border-radius:50%; width:36px; height:36px; border:none; cursor:pointer;"><i class="fas fa-times"></i></button>
+      <img id="fullSizePhoto" src="" alt="Profile Photo" style="display:block; max-width:80vw; max-height:80vh; object-fit:contain;">
+    </div>
+  </div>
+
+  <script src="/JS/custom-alerts.js"></script>
+  <script src="/JS/trainer-dashboard.js"></script>
+  <script>
+    // Apply saved theme on load
+    if (localStorage.getItem('theme') === 'light') {
+      document.body.classList.add('light-mode');
+    }
+    window.addEventListener('DOMContentLoaded', () => {
+      const btn = document.getElementById('themeToggleBtn');
+      if (btn && document.body.classList.contains('light-mode')) {
+        btn.innerHTML = '<i class="fas fa-sun"></i>';
+        btn.style.color = '#fcd34d';
+        btn.style.background = 'rgba(245,158,11,0.15)';
+        btn.style.borderColor = 'rgba(245,158,11,0.4)';
+      }
+    });
+    function toggleTheme() {
+      const body = document.body;
+      const btn = document.getElementById('themeToggleBtn');
+      body.classList.toggle('light-mode');
+      if (body.classList.contains('light-mode')) {
+        localStorage.setItem('theme', 'light');
+        btn.innerHTML = '<i class="fas fa-sun"></i>';
+        btn.style.color = '#fcd34d';
+        btn.style.background = 'rgba(245,158,11,0.15)';
+        btn.style.borderColor = 'rgba(245,158,11,0.4)';
+      } else {
+        localStorage.setItem('theme', 'dark');
+        btn.innerHTML = '<i class="fas fa-moon"></i>';
+        btn.style.color = '#a5b4fc';
+        btn.style.background = 'rgba(255,255,255,0.05)';
+        btn.style.borderColor = 'rgba(255,255,255,0.08)';
+      }
+    }
+  </script>
+</body>
+</html>
