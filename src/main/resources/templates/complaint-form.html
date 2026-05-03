@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Complaints | Royal Gym</title>
+  <link rel="stylesheet" href="/CSS/corporate-style.css?v=7">
+  <link rel="stylesheet" href="/CSS/dashboard-styles.css?v=7">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css?v=8">
+  <style>
+    /* Hero section */
+    .member-hero {
+      background: linear-gradient(135deg, rgba(10,16,32,0.97) 0%, rgba(20,35,70,0.95) 60%, rgba(10,16,32,0.97) 100%);
+      border-bottom: 2px solid rgba(245,158,11,0.35);
+      padding: 28px 0 20px;
+      margin-bottom: 0;
+      position: sticky;
+      top: 62px;
+      z-index: 90;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .hero-inner {
+      max-width: 1440px; margin: 0 auto; padding: 0 16px;
+      display: flex; align-items: center; justify-content: space-between; gap: 18px;
+    }
+    .hero-greeting h1 {
+      font-size: 1.7rem; font-weight: 800;
+      background: linear-gradient(135deg, #f0f9ff 30%, #f59e0b 100%);
+      -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+      margin-bottom: 4px;
+    }
+    .hero-greeting p { color: rgba(255,255,255,0.5); font-size: 0.9rem; margin: 0; }
+
+    /* Layout */
+    .dash-grid {
+      display: grid; grid-template-columns: 1.1fr 1fr; gap: 24px; align-items: start;
+      padding-top: 24px;
+    }
+    @media (max-width: 900px) { .dash-grid { grid-template-columns: 1fr; } }
+    
+    .card {
+      background: linear-gradient(160deg, rgba(20,30,55,0.92), rgba(12,18,35,0.92));
+      border: 1px solid rgba(56,189,248,0.25); border-radius: 6px;
+      padding: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+    }
+    .card-header h2 {
+      color: #f0f9ff; font-size: 1.4rem; display: flex; align-items: center; gap: 10px; margin-bottom: 6px;
+    }
+    .card-header p {
+      color: rgba(255,255,255,0.5); font-size: 0.85rem; margin-bottom: 24px;
+    }
+    
+    .form-group { margin-bottom: 20px; position: relative; }
+    .form-group label {
+      display: flex; justify-content: space-between; font-size: 0.9rem; font-weight: 600; color: #cbd5e1; margin-bottom: 8px;
+    }
+    .form-control {
+      width: 100%; padding: 14px 16px; border-radius: 6px;
+      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.18);
+      color: #f0f9ff; font-family: inherit; font-size: 0.95rem;
+      transition: all 0.3s ease; resize: vertical; box-sizing: border-box;
+    }
+    .form-control:focus {
+      background: rgba(255,255,255,0.08); border-color: rgba(56,189,248,0.6);
+      box-shadow: 0 0 0 3px rgba(56,189,248,0.12); outline: none;
+    }
+    .form-control:read-only { opacity: 0.85; cursor: default; }
+
+    /* Validation UI */
+    .char-count { font-size: 0.75rem; color: rgba(255,255,255,0.4); font-weight: 400; }
+    .validation-err {
+      color: #f87171; font-size: 0.8rem; margin-top: 6px; display: none; font-weight: 500;
+      background: rgba(239, 68, 68, 0.1); padding: 6px 10px; border-radius: 6px; border-left: 3px solid #ef4444;
+    }
+    .form-control.invalid { border-color: #ef4444; }
+
+    .btn-submit {
+      width: 100%; padding: 14px 16px; border-radius: 6px; border: none;
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      color: #fff; font-weight: 700; font-size: 1.05rem; cursor: pointer;
+      transition: all 0.2s; letter-spacing: 0.5px; display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-submit:hover:not(:disabled) {
+      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+      transform: translateY(-2px); box-shadow: 0 8px 20px rgba(245,158,11,0.3);
+    }
+    .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .btn-view {
+      padding: 14px 24px; border-radius: 6px; border: none; flex-shrink: 0;
+      background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
+      color: #fff; font-weight: 700; cursor: pointer; transition: all 0.2s;
+    }
+    .btn-view:hover { box-shadow: 0 8px 20px rgba(56,189,248,0.3); transform: translateY(-2px); }
+
+    .search-row { display: flex; gap: 12px; margin-bottom: 20px; }
+
+    /* Complaint Items */
+    .complaints-wrapper { max-height: 600px; overflow-y: auto; padding-right: 8px; }
+    .complaint-item {
+      background: rgba(10,20,45,0.7); border: 1px solid rgba(56,189,248,0.15);
+      border-left: 4px solid #38bdf8;
+      border-radius: 6px; padding: 20px; margin-bottom: 16px; transition: all 0.3s;
+    }
+    .complaint-item:hover { background: rgba(15,28,60,0.85); border-color: rgba(56,189,248,0.35); }
+    .complaint-header {
+      display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;
+    }
+    .complaint-cat { font-weight: 700; color: #f0f9ff; font-size: 1.05rem; }
+    .complaint-date { font-size: 0.8rem; color: rgba(255,255,255,0.45); margin-top: 3px; }
+    .complaint-desc { color: rgba(255,255,255,0.85); font-size: 0.95rem; margin-bottom: 16px; line-height: 1.5; white-space: pre-wrap; }
+    
+    .status-badge {
+      display: inline-block; padding: 4px 12px; border-radius: 4px; font-size: 0.72rem; font-weight: 700;
+    }
+    .status-pending { background: rgba(245,158,11,0.2); color: #fbbf24; border: 1px solid rgba(245,158,11,0.4); }
+    .status-in-progress { background: rgba(56,189,248,0.2); color: #7dd3fc; border: 1px solid rgba(56,189,248,0.4); }
+    .status-replied { background: rgba(168,85,247,0.2); color: #c084fc; border: 1px solid rgba(168,85,247,0.4); }
+    .status-resolved { background: rgba(16,185,129,0.2); color: #34d399; border: 1px solid rgba(16,185,129,0.4); }
+
+    /* DARK MODE: Member sent vs Admin reply — clearly distinct */
+    .member-reply-block {
+      background: rgba(20,30,60,0.7);
+      border-left: 3px solid #f59e0b;
+      padding: 12px 16px; border-radius: 0 6px 6px 0;
+      margin-top: 12px;
+    }
+    .member-reply-label { font-size: 0.78rem; font-weight: 700; color: #fbbf24; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    .admin-reply {
+      background: rgba(14,165,233,0.12);
+      border-left: 3px solid #38bdf8;
+      padding: 14px 16px; border-radius: 0 6px 6px 0;
+      margin-top: 12px;
+    }
+    .admin-reply-label { font-size: 0.8rem; font-weight: 700; color: #38bdf8; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;}
+    .admin-reply p, .admin-reply-text { color: rgba(255,255,255,0.85) !important; }
+    .reply-date-text { font-size: 0.72rem; color: rgba(255,255,255,0.45); }
+    
+    .btn-delete {
+      background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; border-radius: 4px;
+      padding: 6px 12px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px;
+    }
+    .btn-delete:hover { background: rgba(239, 68, 68, 0.22); border-color: rgba(239, 68, 68, 0.5); color: #fca5a5; }
+
+    /* Custom Scrollbar */
+    .complaints-wrapper::-webkit-scrollbar { width: 6px; }
+    .complaints-wrapper::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 10px; }
+    .complaints-wrapper::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
+    .complaints-wrapper::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.25); }
+
+    /* ====== LIGHT MODE OVERRIDES ====== */
+    body.light-mode .member-hero {
+      background: linear-gradient(135deg, #0a1f4a 0%, #153a7a 60%, #0a1f4a 100%) !important;
+      border-bottom: 2px solid rgba(245,158,11,0.4) !important;
+    }
+    body.light-mode .card {
+      background: #ffffff !important;
+      border-bottom: 1px solid #cbd5e1 !important;
+      border-left: 1px solid #cbd5e1 !important;
+      border-right: 1px solid #cbd5e1 !important;
+      box-shadow: 0 4px 12px rgba(15,23,42,0.08) !important;
+    }
+    body.light-mode .card-header h2 { color: #0f172a !important; }
+    body.light-mode .card-header p { color: #64748b !important; }
+    body.light-mode .form-group label { color: #334155 !important; }
+    body.light-mode .form-control {
+      background: #ffffff !important;
+      border: 1px solid #94a3b8 !important;
+      color: #0f172a !important;
+      font-weight: 600 !important;
+      box-shadow: inset 0 1px 3px rgba(15,23,42,0.05) !important;
+    }
+    body.light-mode .form-control:focus {
+      border-color: #1d4ed8 !important;
+      box-shadow: 0 0 0 3px rgba(29,78,216,0.12) !important;
+    }
+    body.light-mode .form-control::placeholder { color: #94a3b8 !important; font-weight: 500 !important; }
+    body.light-mode .form-control option { background: #ffffff !important; color: #0f172a !important; }
+    body.light-mode .char-count { color: #64748b !important; }
+    /* Light mode complaint items */
+    body.light-mode .complaint-item {
+      background: #f8fafc !important;
+      border: 1px solid #e2e8f0 !important;
+      border-left: 4px solid #1d4ed8 !important;
+    }
+    body.light-mode .complaint-item:hover { background: #f1f5f9 !important; border-color: #94a3b8 !important; }
+    body.light-mode .complaint-cat { color: #0f172a !important; }
+    body.light-mode .complaint-date { color: #64748b !important; }
+    body.light-mode .complaint-desc { color: #334155 !important; }
+    /* Light mode: Member sent block */
+    body.light-mode .member-reply-block {
+      background: #fffbeb !important;
+      border-left: 3px solid #d97706 !important;
+    }
+    body.light-mode .member-reply-label { color: #b45309 !important; }
+    /* Light mode: Admin reply block */
+    body.light-mode .admin-reply {
+      background: #eff6ff !important;
+      border-left: 3px solid #1d4ed8 !important;
+    }
+    body.light-mode .admin-reply-label { color: #1d4ed8 !important; }
+    body.light-mode .admin-reply p,
+    body.light-mode .admin-reply-text { color: #1e3a5f !important; font-weight: 500; }
+    body.light-mode .reply-date-text { color: #64748b !important; }
+    
+    body.light-mode .admin-reply { background: #bfdbfe !important; border-left-color: #2563eb !important; }
+    body.light-mode .member-reply-block { background: #fde68a !important; border-left-color: #d97706 !important; }
+    body.light-mode .member-reply-label { color: #b45309 !important; }
+    body.light-mode .conversation-thread { background: #ffffff !important; border-color: #cbd5e1 !important; }
+    
+    body.light-mode .status-pending { background: #fef3c7 !important; color: #92400e !important; border-color: #d97706 !important; }
+    body.light-mode .status-in-progress { background: #dbeafe !important; color: #1e40af !important; border-color: #3b82f6 !important; }
+    body.light-mode .status-replied { background: #f3e8ff !important; color: #7e22ce !important; border-color: #9333ea !important; }
+    body.light-mode .status-resolved { background: #dcfce7 !important; color: #166534 !important; border-color: #16a34a !important; }
+  </style>
+</head>
+
+<body class="dashboard-dark">
+  <nav class="top-nav">
+    <div class="nav-container">
+      <div class="nav-left">
+        <h2><i class="fas fa-dumbbell"></i> Royal Gym</h2>
+      </div>
+      <div class="nav-right">
+        <button id="themeToggleBtn" class="icon-button" style="margin-right:8px; color:#a5b4fc;" onclick="toggleTheme()" title="Toggle Light/Dark Theme">
+          <i class="fas fa-moon"></i>
+        </button>
+        <a href="/member-dashboard" class="btn" style="background: #ef4444; color: #fff; padding: 8px 16px; border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s;" onmouseover="this.style.background='#dc2626'" onmouseout="this.style.background='#ef4444'">
+          <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="member-hero">
+    <div class="hero-inner">
+      <div class="hero-greeting">
+        <h1><i class="fas fa-exclamation-circle" style="color: #f59e0b;"></i> Complaints Center</h1>
+        <p>Review your submissions or file a new complaint regarding our services.</p>
+      </div>
+    </div>
+  </div>
+
+  <main class="main-content" style="padding-top:0;">
+    <div class="container dash-grid">
+      
+      <!-- LEFT: My Complaints Section -->
+      <div>
+        <div class="card" style="border-top: 3px solid #38bdf8; height: 100%;">
+          <div class="card-header">
+            <h2><i class="fas fa-list-alt" style="color:#38bdf8;"></i> My Complaints</h2>
+
+          </div>
+
+          <div class="complaints-wrapper" id="myComplaintsList">
+            <!-- Populated by JS -->
+            <div style="text-align:center; padding: 40px; color: rgba(255,255,255,0.4);">
+              <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 12px; color: rgba(255,255,255,0.2);"></i>
+              <p>Fetching your complaints...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Submit Complaint Form -->
+      <div>
+        <div class="card" style="border-top: 3px solid #f59e0b;">
+          <div class="card-header">
+            <h2><i class="fas fa-paper-plane" style="color:#f59e0b;"></i> Submit a Complaint</h2>
+
+          </div>
+          <form id="complaintForm">
+            <input type="hidden" id="formMemberId" required>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+              <div class="form-group">
+                <label>Member Name</label>
+                <input type="text" id="memberName" class="form-control" readonly required>
+              </div>
+              <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" id="memberEmail" class="form-control" readonly required>
+              </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+              <div class="form-group">
+                <label>Category</label>
+                <select id="category" class="form-control" required>
+                  <option value="">-- Select a Category --</option>
+                  <option value="Trainer Behaviour">Trainer Behaviour</option>
+                  <option value="Training Issue">Training Issue</option>
+                  <option value="Equipment Issues">Equipment Issues</option>
+                  <option value="Payment Issues">Payment Issues</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              
+              <div class="form-group">
+                <label>Priority</label>
+                <select id="priority" class="form-control" required>
+                  <option value="">-- Select Priority --</option>
+                  <option value="Low">Low</option>
+                  <option value="Medium">Medium </option>
+                  <option value="High">High / Urgent</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Attach Evidence (Optional Photo)</label>
+              <input type="file" id="photoFile" class="form-control" accept="image/*" style="padding: 10px;">
+            </div>
+            
+            <div class="form-group">
+              <label>
+                Detailed Description 
+                <span class="char-count" id="charCount">0 / 500</span>
+              </label>
+              <textarea id="description" class="form-control" rows="6" placeholder="Describe your complaint in detail (min 20 characters)..." maxlength="500" required></textarea>
+              <div class="validation-err" id="descErr">
+                <i class="fas fa-exclamation-triangle"></i> Please provide a little more detail (at least 20 characters) so we can best assist you.
+              </div>
+            </div>
+            <button type="submit" class="btn-submit" id="btnSubmit">
+              <i class="fas fa-shield-alt"></i> Submit Complaint
+            </button>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Edit Complaint Modal (Hidden by Default) -->
+  <div id="editComplaintModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; backdrop-filter:blur(8px); align-items:center; justify-content:center;">
+    <div class="card edit-card modal-content" style="width:90%; max-width:600px; position:relative; overflow-y:auto; max-height:90vh;">
+      <button onclick="closeEditModal()" style="position:absolute; right:20px; top:20px; background:none; border:none; color:rgba(255,255,255,0.5); font-size:1.5rem; cursor:pointer;"><i class="fas fa-times"></i></button>
+      <div class="card-header" style="border-bottom:none; margin-bottom:0;">
+        <h3 class="modal-header-text" style="color:#f0f9ff; font-weight:800; font-size:1.4rem; margin-bottom:8px;"><i class="fas fa-edit" style="color:#38bdf8;"></i> Edit Complaint</h3>
+        <p style="color:rgba(255,255,255,0.6); font-size:0.9rem;">You can only edit complaints while they are in "Pending" status.</p>
+      </div>
+      <form id="editComplaintForm" style="margin-top: 20px;">
+        <input type="hidden" id="editComplaintId" required>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div class="form-group">
+            <label>Category</label>
+            <select id="editCategory" class="form-control" required>
+              <option value="">-- Select a Category --</option>
+              <option value="Trainer Behaviour">Trainer Behaviour</option>
+              <option value="Training Issue">Training Issue</option>
+              <option value="Equipment Issues">Equipment Issues</option>
+              <option value="Payment Issues">Payment Issues</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Priority</label>
+            <select id="editPriority" class="form-control" required>
+              <option value="">-- Select Priority --</option>
+              <option value="Low">Low</option>
+              <option value="Medium">Medium</option>
+              <option value="High">High / Urgent</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Update Evidence (Optional)</label>
+          <input type="file" id="editPhotoFile" class="form-control" accept="image/*" style="padding: 10px;">
+        </div>
+        <div class="form-group">
+          <label>Detailed Description</label>
+          <textarea id="editDescription" class="form-control" rows="5" placeholder="Update your complaint..." maxlength="500" required></textarea>
+        </div>
+        <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 10px;">
+          <button type="button" onclick="closeEditModal()" class="btn-cancel" style="padding: 12px 24px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); background: transparent; color: #fff; cursor:pointer;">Cancel</button>
+          <button type="submit" class="btn-submit" id="btnEditSubmit" style="width: auto; padding: 12px 30px;"><i class="fas fa-save"></i> Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <script src="/JS/custom-alerts.js"></script>
+  <script src="/JS/complaint-form.js?v=8"></script>
+  <script>
+    // Apply saved theme on load
+    if (localStorage.getItem('theme') === 'light') {
+      document.body.classList.add('light-mode');
+      const btn = document.getElementById('themeToggleBtn');
+      if (btn) { btn.innerHTML = '<i class="fas fa-sun"></i>'; btn.style.color = '#fcd34d'; }
+    }
+    function toggleTheme() {
+      const body = document.body;
+      const btn = document.getElementById('themeToggleBtn');
+      body.classList.toggle('light-mode');
+      if (body.classList.contains('light-mode')) {
+        localStorage.setItem('theme', 'light');
+        btn.innerHTML = '<i class="fas fa-sun"></i>';
+        btn.style.color = '#fcd34d';
+      } else {
+        localStorage.setItem('theme', 'dark');
+        btn.innerHTML = '<i class="fas fa-moon"></i>';
+        btn.style.color = '#a5b4fc';
+      }
+    }
+  </script>
+</body>
+</html>
