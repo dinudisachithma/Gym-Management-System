@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <script>
+    (function(){
+      try {
+        var raw = localStorage.getItem('adminUser');
+        var user = raw ? JSON.parse(raw) : null;
+        if (!user || user.role !== 'ADMIN') { window.location.replace('/login'); }
+      } catch (e) { window.location.replace('/login'); }
+    })();
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard | Royal Gym</title>
+  <link rel="stylesheet" href="/CSS/corporate-style.css">
+  <link rel="stylesheet" href="/CSS/dashboard-styles.css">
+  <style>
+    .tab-coming-soon {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+    .tab-nav-btn {
+      width: 155px;
+      padding: 13px 10px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border-radius: 30px;
+      border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(15,25,50,0.75);
+      color: rgba(255,255,255,0.8);
+      font-size: 1.0rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.25s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      position: relative;
+    }
+    .tab-nav-btn:hover {
+      color: #fff;
+      background: rgba(20,35,65,0.92);
+      border-color: rgba(245,158,11,0.5);
+      box-shadow: 0 4px 14px rgba(245,158,11,0.15);
+      transform: translateY(-1px);
+      text-decoration: none;
+    }
+    .tab-nav-btn.active-page {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #0c1222;
+      border-color: #f59e0b;
+      box-shadow: 0 4px 16px rgba(245,158,11,0.4);
+      font-weight: 700;
+    }
+    body.light-mode .tab-nav-btn {
+      background: rgba(248,250,252,0.9) !important;
+      border: 1px solid rgba(148,163,184,0.45) !important;
+      color: #0f172a !important;
+      box-shadow: 0 1px 6px rgba(15,23,42,0.08) !important;
+    }
+    body.light-mode .tab-nav-btn:hover {
+      background: #ffffff !important;
+      color: #0f172a !important;
+      border-color: rgba(148,163,184,0.6) !important;
+    }
+    body.light-mode .tab-nav-btn.active-page {
+      background: linear-gradient(135deg, #facc15, #f59e0b) !important;
+      color: #0f172a !important;
+      border-color: rgba(245,158,11,0.9) !important;
+      box-shadow: 0 12px 22px rgba(245,158,11,0.16) !important;
+    }
+    .tab-nav-btn.disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+    /* keep Members as original active tab-btn */
+    .tab-btn.active {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #0c1222;
+      border-color: #f59e0b;
+      box-shadow: 0 4px 16px rgba(245,158,11,0.4);
+      font-weight: 700;
+      border-radius: 30px;
+    }
+
+    .coming-soon-panel {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 20px;
+      gap: 14px;
+      color: #94a3b8;
+      text-align: center;
+    }
+
+    .coming-soon-panel i {
+      font-size: 2.5rem;
+      margin-bottom: 4px;
+    }
+
+    .coming-soon-panel h3 {
+      margin: 0;
+      font-size: 1.2rem;
+      color: #cbd5e1;
+    }
+
+    .coming-soon-panel p {
+      margin: 0;
+      font-size: 0.9rem;
+    }
+
+    /* ===== Payment section styles ===== */
+    .payment-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #ef4444;
+      color: #fff;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+
+    .status-pill {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+
+    .status-pending {
+      background: rgba(234, 179, 8, 0.15);
+      color: #eab308;
+      border: 1px solid rgba(234, 179, 8, 0.35);
+    }
+
+    .status-validated {
+      background: rgba(34, 197, 94, 0.12);
+      color: #22c55e;
+      border: 1px solid rgba(34, 197, 94, 0.3);
+    }
+
+    .status-rejected {
+      background: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .btn-sm-success {
+      background: rgba(34, 197, 94, 0.12);
+      border: 1px solid rgba(34, 197, 94, 0.35);
+      color: #22c55e;
+      border-radius: 6px;
+      padding: 5px 12px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s;
+    }
+
+    .btn-sm-success:hover {
+      background: rgba(34, 197, 94, 0.22);
+    }
+
+    .btn-sm-danger {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #ef4444;
+      border-radius: 6px;
+      padding: 5px 12px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s;
+    }
+
+    .btn-sm-danger:hover {
+      background: rgba(239, 68, 68, 0.18);
+    }
+
+    #paymentsFilterRow {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 14px;
+      align-items: center;
+    }
+
+    #paymentsFilterRow select {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #fff;
+      border-radius: 7px;
+      padding: 6px 12px;
+      font-size: 0.85rem;
+    }
+
+    /* ── Member detail slide-out drawer ── */
+    .drawer-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      backdrop-filter: blur(3px);
+      z-index: 900;
+      transition: opacity 0.25s;
+    }
+    .drawer-overlay.open { display: block; }
+    .member-drawer {
+      position: fixed;
+      top: 0; right: 0;
+      width: 420px;
+      height: 100vh;
+      background: linear-gradient(160deg, rgba(18,28,55,0.99) 0%, rgba(12,18,38,0.99) 100%);
+      border-left: 1px solid rgba(245,158,11,0.2);
+      box-shadow: -8px 0 40px rgba(0,0,0,0.6);
+      z-index: 950;
+      transform: translateX(100%);
+      transition: transform 0.32s cubic-bezier(0.4,0,0.2,1);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+    .member-drawer.open { transform: translateX(0) !important; }
+    .drawer-top {
+      padding: 22px 24px 18px;
+      border-bottom: 1px solid rgba(245,158,11,0.12);
+      background: linear-gradient(90deg,rgba(245,158,11,0.07),transparent);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .drawer-top h3 { font-size: 1rem; font-weight: 700; color: #f0f9ff; margin: 0; }
+    .drawer-close {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.6);
+      border-radius: 8px;
+      width: 32px; height: 32px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 1rem;
+      transition: all 0.2s;
+    }
+    .drawer-close:hover { background: rgba(239,68,68,0.15); color: #f87171; border-color: rgba(239,68,68,0.3); }
+    .drawer-body { padding: 22px 24px; flex: 1; }
+    .drawer-avatar-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+    .drawer-avatar {
+      width: 60px; height: 60px; border-radius: 50%;
+      background: linear-gradient(135deg,#1e3a5f,#0f296b);
+      border: 2px solid rgba(245,158,11,0.45);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; color: #f59e0b; flex-shrink: 0;
+    }
+    .drawer-name { font-size: 1.15rem; font-weight: 800; color: #f0f9ff; margin-bottom: 5px; }
+    .drawer-section-title {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgba(245,158,11,0.7);
+      margin: 20px 0 10px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .drawer-section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg,rgba(245,158,11,0.25),transparent);
+    }
+    .drawer-info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .drawer-info-item {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 10px;
+      padding: 12px 14px;
+    }
+    .drawer-info-item.full { grid-column: 1 / -1; }
+    .drawer-info-item label {
+      display: block;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: rgba(255,255,255,0.38);
+      margin-bottom: 5px;
+      font-weight: 600;
+    }
+    .drawer-info-item .val { font-size: 0.9rem; color: #f0f9ff; font-weight: 500; word-break: break-word; }
+    .drawer-mem-card {
+      background: linear-gradient(135deg,rgba(20,35,70,0.9),rgba(12,20,42,0.95));
+      border: 1px solid rgba(245,158,11,0.2);
+      border-top: 2px solid rgba(245,158,11,0.6);
+      border-radius: 14px;
+      padding: 18px;
+      margin-top: 8px;
+    }
+    .drawer-mem-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      font-size: 0.85rem;
+    }
+    .drawer-mem-row:last-child { border-bottom: none; }
+    .drawer-mem-row .lbl { color: rgba(255,255,255,0.4); }
+    .drawer-mem-row .mval { color: #f0f9ff; font-weight: 600; }
+    .drawer-progress-track {
+      height: 5px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 12px;
+    }
+    .drawer-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg,#38bdf8,#f59e0b);
+      border-radius: 10px;
+      transition: width 0.6s ease;
+    }
+    .drawer-progress-label {
+      display: flex; justify-content: space-between;
+      font-size: 0.72rem; color: rgba(255,255,255,0.4); margin-top: 5px;
+    }
+    .drawer-progress-label span:last-child { color: #f59e0b; font-weight: 600; }
+    /* Make table rows look clickable */
+    #membersTableBody tr { cursor: pointer; }
+
+    /* ── Stats + chart bento ── */
+    .admin-top-bento {
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      gap: 20px;
+      align-items: stretch;
+      margin-bottom: 24px;
+    }
+    .chart-card {
+      background: linear-gradient(160deg,rgba(20,30,55,0.97),rgba(14,20,42,0.98));
+      border: 1px solid rgba(245,158,11,0.18);
+      border-top: 2px solid rgba(245,158,11,0.6);
+      border-radius: 16px;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .chart-card::before {
+      content:'';
+      position:absolute;top:0;left:0;right:0;
+      height:1px;
+      background:linear-gradient(90deg,transparent,rgba(245,158,11,0.4),rgba(56,189,248,0.25),transparent);
+      pointer-events:none;
+    }
+    .chart-card-title {
+      font-size:0.72rem;font-weight:700;
+      text-transform:uppercase;letter-spacing:0.08em;
+      color:rgba(245,158,11,0.75);
+      margin-bottom:14px;
+      display:flex;align-items:center;gap:6px;
+    }
+    .chart-legend { margin-top:14px; display:flex; flex-direction:column; gap:7px; }
+    .legend-row {
+      display:flex;align-items:center;justify-content:space-between;font-size:0.8rem;
+    }
+    .legend-dot {
+      width:10px;height:10px;border-radius:50%;margin-right:7px;flex-shrink:0;
+    }
+    .legend-label { display:flex;align-items:center;color:rgba(255,255,255,0.6); }
+    .legend-count { color:#f0f9ff;font-weight:700; }
+    @media(max-width:900px) {
+      .admin-top-bento { grid-template-columns:1fr; }
+    }
+    /* ── Drawer send message button ── */
+    .drawer-msg-btn {
+      display:flex;align-items:center;justify-content:center;gap:8px;
+      width:100%;padding:12px;margin-top:22px;
+      background:linear-gradient(135deg,rgba(56,189,248,0.15),rgba(14,165,233,0.08));
+      border:1px solid rgba(56,189,248,0.35);
+      border-radius:12px;color:#38bdf8;
+      font-size:0.88rem;font-weight:700;
+      cursor:pointer;transition:all 0.22s;
+    }
+    .drawer-msg-btn:hover {
+      background:linear-gradient(135deg,rgba(56,189,248,0.28),rgba(14,165,233,0.15));
+      border-color:rgba(56,189,248,0.6);
+      box-shadow:0 6px 20px rgba(56,189,248,0.2);
+      transform:translateY(-2px);
+    }
+
+    /* ── UI Gap Fillers ── */
+    @keyframes pulse-green {
+      0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+      70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+    .sync-indicator {
+      width: 8px; height: 8px; background: #10b981; border-radius: 50%;
+      animation: pulse-green 2s infinite;
+    }
+    
+    /* Focus Mode UI */
+    body.focus-mode .admin-hero-strip,
+    body.focus-mode .admin-top-bento {
+      display: none !important;
+    }
+    body.focus-mode .tabs {
+      margin-top: 15px;
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+
+<body class="dashboard-dark admin-dashboard-page">
+  <nav class="top-nav">
+    <div class="nav-container">
+      <div class="nav-left">
+        <h2><i class="fas fa-dumbbell"></i> Royal Gym</h2>
+      </div>
+      <div class="nav-center"></div>
+      <div class="nav-right">
+        <div class="notifications">
+          <button class="icon-button" onclick="toggleDeletionDropdown(event)">
+            <i class="fas fa-bell"></i>
+            <span class="notification-badge" id="notificationCount">0</span>
+          </button>
+        </div>
+        <button id="themeToggleBtn" class="icon-button" style="margin-right:8px; color:#a5b4fc;" onclick="toggleTheme()" title="Toggle Light/Dark Theme">
+          <i class="fas fa-moon"></i>
+        </button>
+        <button id="focusModeBtn" class="icon-button" style="margin-right:8px; color:#38bdf8;" onclick="toggleFocusMode()" title="Toggle Focus Mode">
+          <i class="fas fa-expand-arrows-alt"></i>
+        </button>
+        <button class="btn btn-danger" onclick="logout()">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Deletion requests dropdown (shown when bell icon clicked) -->
+  <div id="deletionBellDropdown" class="deletion-bell-dropdown" style="display:none;">
+    <div class="deletion-bell-header">
+      <i class="fas fa-triangle-exclamation"></i> Deletion Requests
+    </div>
+    <div id="deletionBellBody" class="deletion-bell-body">
+      <!-- Filled by admin-dashboard.js -->
+    </div>
+    <div class="deletion-bell-footer">
+      <button class="btn btn-secondary btn-sm" onclick="window.location.href='/admin-notifications'">
+        <i class="fas fa-bell"></i> Generate Message
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Admin Hero Strip ── -->
+  <div id="adminHeroStrip" class="admin-hero-strip" style="background:linear-gradient(135deg,rgba(10,16,32,0.97) 0%,rgba(20,38,80,0.92) 60%,rgba(10,16,32,0.97) 100%);border-bottom:1px solid rgba(245,158,11,0.2);padding:20px 0 16px;margin-bottom:0;">
+    <div style="max-width:1440px;margin:0 auto;padding:0 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+      <div>
+        <h2 class="hero-title">
+          <i class="fas fa-chart-line"></i> &nbsp;Admin Dashboard
+        </h2>
+        <p style="font-size:0.8rem;color:rgba(255,255,255,0.4);margin:0;">Manage members, payments and gym operations</p>
+      </div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:8px;padding:9px 16px;border-radius:30px;background:linear-gradient(135deg,rgba(56,189,248,0.18),rgba(14,165,233,0.08));border:1px solid rgba(56,189,248,0.3);color:#38bdf8;font-size:0.82rem;font-weight:700;">
+          <i class="fas fa-users"></i>
+          <span id="heroTotalMembers">—</span> Members
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;padding:9px 16px;border-radius:30px;background:linear-gradient(135deg,rgba(245,158,11,0.18),rgba(217,119,6,0.08));border:1px solid rgba(245,158,11,0.3);color:#f59e0b;font-size:0.82rem;font-weight:700;">
+          <i class="fas fa-bell"></i>
+          <span id="heroPendingPayments">—</span> Pending
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;padding:9px 16px;border-radius:30px;background:linear-gradient(135deg,rgba(16,185,129,0.18),rgba(5,150,105,0.08));border:1px solid rgba(16,185,129,0.3);color:#34d399;font-size:0.82rem;font-weight:700;">
+          <i class="fas fa-check-circle"></i>
+          <span id="heroActiveMembers">—</span> Active
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <main class="main-content">
+    <div class="container">
+      <!-- Stats + Donut bento -->
+      <div class="admin-top-bento">
+        <!-- Left: stat cards -->
+        <div>
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon" style="background:linear-gradient(135deg,rgba(56,189,248,0.9),rgba(14,165,233,0.7));box-shadow:0 4px 16px rgba(56,189,248,0.3);">
+                <i class="fas fa-users"></i>
+              </div>
+              <div class="stat-content">
+                <div class="stat-number" id="totalMembers">0</div>
+                <div class="stat-label">Total Members</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon" style="background:linear-gradient(135deg,rgba(20,184,166,0.9),rgba(13,148,136,0.7));box-shadow:0 4px 16px rgba(20,184,166,0.3);">
+                <i class="fas fa-user-tie"></i>
+              </div>
+              <div class="stat-content">
+                <div class="stat-number" id="totalTrainers">0</div>
+                <div class="stat-label">Trainers</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon" style="background:linear-gradient(135deg,rgba(245,158,11,0.9),rgba(217,119,6,0.7));box-shadow:0 4px 16px rgba(245,158,11,0.3);">
+                <i class="fas fa-exclamation-circle"></i>
+              </div>
+              <div class="stat-content">
+                <div class="stat-number" id="pendingRequests">0</div>
+                <div class="stat-label">Pending Requests</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Monthly Growth Target Tracker (Fills the empty space below stat cards) -->
+          <div id="growthTrackerCard" style="margin-top:20px; background:linear-gradient(160deg, rgba(56,189,248,0.12), rgba(99,102,241,0.08)); border:1px solid rgba(56,189,248,0.25); border-left:4px solid #38bdf8; border-radius:16px; padding:20px 104px 20px 24px; position:relative; overflow:hidden; display:flex; flex-direction:column; justify-content:center; flex:1;">
+            
+            <!-- Calendar Widget overlay -->
+            <div class="calendar-widget">
+              <div id="calMonth">---</div>
+              <div id="calDate">--</div>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:12px;">
+              <div>
+                <h4 style="font-size:0.75rem; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:0.08em; margin:0 0 4px; display:flex; align-items:center; gap:6px;">
+                  <i class="fas fa-bullseye" style="color:#38bdf8;"></i> Monthly Growth Target
+                </h4>
+                <div style="font-size:1.4rem; font-weight:800; color:#f0f9ff; display:flex; align-items:baseline; gap:8px;">
+                  <span id="growthCurrentMonth">0</span> <span style="font-size:0.85rem; color:rgba(255,255,255,0.4); font-weight:600;">/ <span id="growthTargetValue">50</span> New Members</span>
+                </div>
+              </div>
+              <div id="growthPercentText" style="font-size:1.1rem; font-weight:800; color:#38bdf8; position:relative;">
+                0%
+              </div>
+            </div>
+            
+            <!-- Progress Bar -->
+            <div style="height:6px; background:rgba(255,255,255,0.1); border-radius:10px; overflow:hidden; position:relative;">
+              <div id="growthProgressBar" style="width:0%; height:100%; background:linear-gradient(90deg, #38bdf8, #818cf8); border-radius:10px; box-shadow:0 0 10px rgba(56,189,248,0.4); transition: width 1s ease-out;"></div>
+            </div>
+            
+            <div style="margin-top:10px; font-size:0.72rem; color:rgba(255,255,255,0.4); display:flex; align-items:center; gap:6px;">
+              <span id="growthPaceBadge" style="background:rgba(16,185,129,0.15); color:#10b981; padding:2px 6px; border-radius:4px; font-weight:700;"><i class="fas fa-spinner fa-spin"></i></span>
+              <span id="growthPaceText">Calculating pace based on last month...</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right: Donut chart card -->
+        <div class="chart-card">
+          <div class="chart-card-title"><i class="fas fa-chart-pie"></i> Plan Distribution</div>
+          <div style="position:relative;width:160px;height:160px;margin:0 auto;">
+            <canvas id="planDonutChart" width="160" height="160"></canvas>
+            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;">
+              <div id="donutCenterNum" style="font-size:1.6rem;font-weight:800;color:#f0f9ff;line-height:1;">—</div>
+              <div style="font-size:0.65rem;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.06em;margin-top:3px;">Members</div>
+            </div>
+          </div>
+          <div class="chart-legend">
+            <div class="legend-row">
+              <div class="legend-label"><span class="legend-dot" style="background:#38bdf8;"></span>Monthly</div>
+              <span class="legend-count" id="lgMonthly">0</span>
+            </div>
+            <div class="legend-row">
+              <div class="legend-label"><span class="legend-dot" style="background:#f59e0b;"></span>Quarterly</div>
+              <span class="legend-count" id="lgQuarterly">0</span>
+            </div>
+            <div class="legend-row">
+              <div class="legend-label"><span class="legend-dot" style="background:#34d399;"></span>Annually</div>
+              <span class="legend-count" id="lgAnnually">0</span>
+            </div>
+            <div class="legend-row" style="border-top:1px solid rgba(255,255,255,0.07);padding-top:7px;margin-top:3px;">
+              <div class="legend-label"><span class="legend-dot" style="background:rgba(255,255,255,0.15);"></span>No Package</div>
+              <span class="legend-count" id="lgNone">0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation tab buttons & Right-side gap fillers -->
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:16px; width:100%;">
+        <div class="tabs" style="margin-bottom:0; flex-wrap:nowrap; overflow-x:auto; padding-bottom:5px;">
+          <!-- Members: stays inline (active page) -->
+          <button class="tab-btn active" data-tab="members">Members</button>
+          <!-- Payments: redirect to pt-dashboard -->
+          <a href="/pt-dashboard" class="tab-nav-btn">
+            <i class="fas fa-credit-card"></i> Payments
+            <span class="payment-badge" id="paymentBadge" style="display:none;">0</span>
+          </a>
+          <!-- Other tabs -->
+          <a href="/admin-trainers" class="tab-nav-btn"><i class="fas fa-user-tie"></i> Trainers</a>
+          <a href="/admin-attendance-record" class="tab-nav-btn"><i class="fas fa-calendar-check"></i> Attendance</a>
+          <a href="/manage-complaints" class="tab-nav-btn"><i class="fas fa-comments"></i> Complaints</a>
+          <a href="/report-admin-dashboard" class="tab-nav-btn"><i class="fas fa-chart-bar"></i> Reports</a>
+          <a href="/admin-churn" class="tab-nav-btn"><i class="fas fa-brain"></i> Churn AI</a>
+        </div>
+
+        <!-- Right space cleared as requested -->
+        <div class="right-gap-fillers" style="display:none;"></div>
+      </div>
+
+      <div class="tab-content">
+        <div id="members" class="tab-pane active">
+          <div class="admin-members-layout">
+              <div class="card" id="deletionRequestsCard" style="display:none;">
+                <div class="card-header">
+                  <h3><i class="fas fa-user-minus"></i> Pending deletion requests</h3>
+                </div>
+                <div class="card-body">
+                  <p class="muted" style="margin-bottom:12px;">Members who requested account deletion. Click Approve to
+                    delete their account.</p>
+                  <div class="table-container">
+                    <table class="data-table">
+                      <thead>
+                        <tr>
+                          <th>Name</th>
+                          <th>Email</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody id="deletionRequestsBody"></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-header member-toolbar-header">
+                  <h3><i class="fas fa-users"></i> Member Management</h3>
+                  <div class="member-toolbar-controls">
+                    <div class="member-search-wrap">
+                      <i class="fas fa-search"></i>
+                      <input id="memberSearch" type="text" placeholder="Search by email" oninput="loadMembers()">
+                    </div>
+                    <label class="member-filter-label">Filter:</label>
+                    <select id="memberStatusFilter" onchange="loadMembers()"
+                      style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#fff;border-radius:7px;padding:6px 12px;font-size:0.84rem;cursor:pointer;">
+                      <option value="all">All Members</option>
+                      <option value="paid">Paid</option>
+                      <option value="active">Active</option>
+                      <option value="pending">Pending</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <div class="member-table-wrapper">
+                    <button class="member-table-refresh-btn" onclick="loadMembers()" title="Refresh members"><i class="fas fa-sync-alt"></i></button>
+                    <div class="table-container">
+                      <table class="data-table">
+                        <thead>
+                          <tr>
+                            <th>Membership ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Membership</th>
+                            <th>Status</th>
+                            <th>Activation</th>
+                            <th>Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody id="membersTableBody"></tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="/JS/admin-dashboard.js?v=5"></script>
+  <script>
+    // Initialize Theme from localStorage
+    if (localStorage.getItem('theme') === 'light') {
+      document.body.classList.add('light-mode');
+    }
+    
+    // Update theme toggle button visually on load
+    window.addEventListener('DOMContentLoaded', () => {
+      const themeBtn = document.getElementById('themeToggleBtn');
+      if (themeBtn && document.body.classList.contains('light-mode')) {
+        themeBtn.innerHTML = '<i class="fas fa-sun"></i>';
+        themeBtn.style.color = '#fcd34d';
+        themeBtn.style.background = 'rgba(245,158,11,0.15)';
+        themeBtn.style.borderColor = 'rgba(245,158,11,0.4)';
+      }
+    });
+
+    function toggleTheme() {
+      const body = document.body;
+      const btn = document.getElementById('themeToggleBtn');
+      body.classList.toggle('light-mode');
+      
+      if (body.classList.contains('light-mode')) {
+        localStorage.setItem('theme', 'light');
+        btn.innerHTML = '<i class="fas fa-sun"></i>';
+        btn.style.color = '#fcd34d';
+        btn.style.background = 'rgba(245,158,11,0.15)';
+        btn.style.borderColor = 'rgba(245,158,11,0.4)';
+      } else {
+        localStorage.setItem('theme', 'dark');
+        btn.innerHTML = '<i class="fas fa-moon"></i>';
+        btn.style.color = '#a5b4fc';
+        btn.style.background = 'rgba(255, 255, 255, 0.05)';
+        btn.style.borderColor = 'rgba(255,255,255,0.08)';
+      }
+    }
+
+    function toggleFocusMode() {
+      const body = document.body;
+      const btn = document.getElementById('focusModeBtn');
+      body.classList.toggle('focus-mode');
+      
+      if (body.classList.contains('focus-mode')) {
+        btn.innerHTML = '<i class="fas fa-compress-arrows-alt"></i>';
+        btn.style.background = 'rgba(56,189,248,0.15)';
+        btn.style.borderColor = 'rgba(56,189,248,0.4)';
+      } else {
+        btn.innerHTML = '<i class="fas fa-expand-arrows-alt"></i>';
+        btn.style.background = 'rgba(255, 255, 255, 0.05)';
+        btn.style.borderColor = 'rgba(255,255,255,0.08)';
+      }
+    }
+  </script>
+
+  <!-- ── Member Detail Drawer ── -->
+  <div class="drawer-overlay" id="drawerOverlay" onclick="closeMemberDrawer()"></div>
+  <div class="member-drawer" id="memberDrawer">
+    <div class="drawer-top">
+      <h3><i class="fas fa-user-circle" style="color:#f59e0b;margin-right:8px;"></i> Member Profile</h3>
+      <button class="drawer-close" onclick="closeMemberDrawer()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="drawer-body">
+      <!-- Avatar + name -->
+      <div class="drawer-avatar-row">
+        <div class="drawer-avatar"><i class="fas fa-user"></i></div>
+        <div>
+          <div class="drawer-name" id="drName">—</div>
+          <span id="drStatusPill" style="font-size:0.75rem;font-weight:700;padding:4px 12px;border-radius:20px;"></span>
+        </div>
+      </div>
+
+      <!-- Personal details -->
+      <div class="drawer-section-title"><i class="fas fa-address-card"></i> Personal Details</div>
+      <div class="drawer-info-grid">
+        <div class="drawer-info-item full">
+          <label>Email Address</label>
+          <div class="val" id="drEmail">—</div>
+        </div>
+        <div class="drawer-info-item">
+          <label>Phone</label>
+          <div class="val" id="drPhone">—</div>
+        </div>
+        <div class="drawer-info-item">
+          <label>Gender</label>
+          <div class="val" id="drGender">—</div>
+        </div>
+        <div class="drawer-info-item">
+          <label>Age</label>
+          <div class="val" id="drAge">—</div>
+        </div>
+        <div class="drawer-info-item">
+          <label>City</label>
+          <div class="val" id="drCity">—</div>
+        </div>
+        <div class="drawer-info-item full">
+          <label>Address</label>
+          <div class="val" id="drAddress">—</div>
+        </div>
+      </div>
+
+      <!-- Membership -->
+      <div class="drawer-section-title"><i class="fas fa-id-card"></i> Membership</div>
+      <div id="drNoMembership" style="color:rgba(255,255,255,0.35);font-size:0.85rem;padding:12px 0;display:none;">
+        <i class="fas fa-info-circle"></i> No active membership yet.
+      </div>
+      <div class="drawer-mem-card" id="drMemCard">
+        <div class="drawer-mem-row">
+          <span class="lbl">Member ID</span>
+          <span class="mval" id="drMemId">—</span>
+        </div>
+        <div class="drawer-mem-row">
+          <span class="lbl">Package</span>
+          <span class="mval" id="drPackage">—</span>
+        </div>
+        <div class="drawer-mem-row">
+          <span class="lbl">Activated</span>
+          <span class="mval" id="drActivated">—</span>
+        </div>
+        <div class="drawer-mem-row">
+          <span class="lbl">Days Remaining</span>
+          <span class="mval" id="drDaysLeft">—</span>
+        </div>
+        <div class="drawer-progress-track">
+          <div class="drawer-progress-fill" id="drProgressFill" style="width:0%;"></div>
+        </div>
+        <div class="drawer-progress-label">
+          <span id="drProgStart">—</span>
+          <span id="drProgEnd">—</span>
+        </div>
+      </div>
+
+      <!-- Open notifications UI -->
+      <div class="drawer-section-title" style="margin-top:22px;"><i class="fas fa-paper-plane"></i> Actions</div>
+      <button class="drawer-msg-btn" id="drSendMsgBtn" onclick="window.location.href='/admin-notifications'">
+        <i class="fas fa-envelope"></i> Send Message / Notification
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Deletion Requests Drawer ── -->
+  <div class="drawer-overlay" id="deletionDrawerOverlay" style="display:none;" onclick="closeDeletionDrawer()"></div>
+  <div class="deletion-drawer" id="deletionDrawer">
+    <div class="drawer-top" style="background:linear-gradient(90deg,rgba(239,68,68,0.08),transparent);border-bottom-color:rgba(239,68,68,0.2);">
+      <h3><i class="fas fa-triangle-exclamation" style="color:#ef4444;margin-right:8px;"></i> Deletion Requests</h3>
+      <button class="drawer-close" onclick="closeDeletionDrawer()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <div style="flex:1;overflow-y:auto;padding:16px 20px;">
+      <div id="deletionDrawerContent" style="display:flex;flex-direction:column;gap:12px;">
+        <!-- Filled by JS -->
+        <div style="text-align:center;color:rgba(255,255,255,0.4);padding:20px;">
+          <i class="fas fa-spinner fa-spin"></i> Loading...
+        </div>
+      </div>
+    </div>
+
+    <div style="padding:16px 20px;border-top:1px solid rgba(255,255,255,0.1);background:rgba(0,0,0,0.2);">
+      <button class="btn btn-primary" style="width:100%;" onclick="refreshDeletionDrawer()">
+        <i class="fas fa-sync-alt"></i> Refresh
+      </button>
+    </div>
+  </div>
+
+  <style>
+    /* Deletion drawer styles — mirror member drawer pattern */
+    .deletion-drawer {
+      position: fixed;
+      top: 0; right: 0;
+      width: 420px;
+      height: 100vh;
+      background: linear-gradient(160deg, rgba(20,18,35,0.99) 0%, rgba(15,12,32,0.99) 100%);
+      border-left: 1px solid rgba(239,68,68,0.25);
+      box-shadow: -8px 0 40px rgba(0,0,0,0.6);
+      z-index: 950;
+      transform: translateX(100%);
+      transition: transform 0.32s cubic-bezier(0.4,0,0.2,1);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+    .deletion-drawer.open { transform: translateX(0) !important; }
+
+    .deletion-request-item {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(239,68,68,0.15);
+      border-radius: 12px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .deletion-request-item:hover {
+      background: rgba(255,255,255,0.06);
+      border-color: rgba(239,68,68,0.3);
+    }
+    .deletion-request-item-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .deletion-request-item-name {
+      font-weight: 700;
+      color: #f0f9ff;
+      font-size: 0.95rem;
+    }
+    .deletion-request-item-email {
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.5);
+    }
+    .deletion-request-item-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .deletion-request-item-actions button {
+      flex: 1;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid transparent;
+    }
+    .deletion-request-approve {
+      background: rgba(16,185,129,0.15);
+      color: #34d399;
+      border-color: rgba(16,185,129,0.3);
+    }
+    .deletion-request-approve:hover {
+      background: rgba(16,185,129,0.25);
+      border-color: rgba(16,185,129,0.5);
+    }
+    .deletion-request-deny {
+      background: rgba(239,68,68,0.15);
+      color: #f87171;
+      border-color: rgba(239,68,68,0.3);
+    }
+    .deletion-request-deny:hover {
+      background: rgba(239,68,68,0.25);
+      border-color: rgba(239,68,68,0.5);
+    }
+    .deletion-drawer-empty {
+      text-align: center;
+      color: rgba(255,255,255,0.4);
+      padding: 40px 20px;
+      font-size: 0.9rem;
+    }
+
+    /* Calendar Widget */
+    .calendar-widget {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        right: 24px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        width: 60px;
+        height: 60px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        z-index: 5;
+    }
+    #calMonth {
+        font-size: 0.70rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #38bdf8;
+        letter-spacing: 0.08em;
+        margin-bottom: 2px;
+    }
+    #calDate {
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: #fff;
+        line-height: 1;
+    }
+    
+    /* LIGHT MODE OVERRIDES FOR DELETION DRAWER & DROPDOWN */
+    body.light-mode .deletion-bell-footer .btn-secondary { background: #fffbeb !important; border: 1px solid #fcd34d !important; color: #d97706 !important; font-weight: 700; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.1); }
+    body.light-mode .deletion-bell-footer .btn-secondary:hover { background: #fef3c7 !important; border-color: #f59e0b !important; color: #b45309 !important; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2); }
+
+    /* New Light Mode Overrides for Growth & Plan Cards */
+    body.light-mode #growthTrackerCard {
+        background: linear-gradient(160deg, #eff6ff, #f8fafc) !important;
+        border-color: #38bdf8 !important;
+        border-left: 4px solid #0284c7 !important;
+    }
+    body.light-mode #growthTrackerCard h4 { color: #64748b !important; }
+    body.light-mode #growthTrackerCard i { color: #0284c7 !important; }
+    body.light-mode #growthCurrentMonth { color: #0f172a !important; }
+    body.light-mode #growthTargetValue { color: #64748b !important; }
+    body.light-mode #growthPercentText { color: #0284c7 !important; }
+    body.light-mode #growthTrackerCard .fa-spinner { color: #10b981 !important; }
+    body.light-mode #growthPaceText { color: #64748b !important; }
+    
+    /* Progress Bar Visibility in Light Mode */
+    body.light-mode #growthTrackerCard div[style*="background:rgba(255,255,255,0.1)"] {
+        background: #e2e8f0 !important;
+    }
+    
+    /* Calendar Widget in Light Mode */
+    body.light-mode .calendar-widget {
+        background: #ffffff !important;
+        border-color: #e2e8f0 !important;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+    }
+    body.light-mode #calMonth { color: #0284c7 !important; }
+    body.light-mode #calDate { color: #0f172a !important; }
+
+    /* Plan Distribution Light Blue Theme */
+    body.light-mode .chart-card {
+        background: linear-gradient(160deg, #f0f9ff, #ffffff) !important;
+        border-color: #bae6fd !important;
+        border-top: 2px solid #38bdf8 !important;
+    }
+    body.light-mode .chart-card-title { color: #0284c7 !important; }
+    body.light-mode #donutCenterNum { color: #0f172a !important; }
+    body.light-mode #donutCenterNum + div { color: #64748b !important; }
+    body.light-mode .legend-label { color: #475569 !important; }
+    body.light-mode .legend-count { color: #0f172a !important; }
+    body.light-mode .legend-row { border-color: #e2e8f0 !important; }
+    body.light-mode .legend-dot[style*="rgba(255,255,255,0.15)"] { background: #cbd5e1 !important; }
+  </style>
+
+  <!-- Unified UI Modals for Alert & Confirm -->
+  <div id="uiConfirmModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.8);backdrop-filter:blur(5px);z-index:9999;display:none;align-items:center;justify-content:center;">
+    <div style="background:linear-gradient(160deg, rgba(20,30,55,1), rgba(12,18,35,1));border:1px solid rgba(239,68,68,0.4);border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,0.5);width:90%;max-width:400px;text-align:center;padding:30px;transform:scale(0.95);transition:all 0.3s;" id="uiConfirmBox">
+      <div id="uiConfirmIcon" style="width:60px;height:60px;border-radius:50%;background:rgba(239,68,68,0.15);color:#ef4444;display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin:0 auto 20px;">
+        <i class="fas fa-exclamation-triangle"></i>
+      </div>
+      <h3 id="uiConfirmTitle" style="color:#f0f9ff;font-size:1.2rem;font-weight:700;margin-bottom:12px;">Are you sure?</h3>
+      <div id="uiConfirmMessage" style="color:#94a3b8;font-size:0.9rem;margin-bottom:24px;line-height:1.5;"></div>
+      <div style="display:flex;gap:12px;" id="uiConfirmButtons">
+        <button id="uiCancelBtn" onclick="closeUiConfirm(false)" style="flex:1;padding:12px;border-radius:8px;background:rgba(255,255,255,0.05);color:#f0f9ff;border:1px solid rgba(255,255,255,0.1);font-weight:600;cursor:pointer;transition:all 0.2s;">Cancel</button>
+        <button id="uiConfirmActionBtn" onclick="closeUiConfirm(true)" style="flex:1;padding:12px;border-radius:8px;background:linear-gradient(135deg, #ef4444, #b91c1c);color:#fff;border:none;font-weight:600;cursor:pointer;transition:all 0.2s;">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const date = new Date();
+      const calMonth = document.getElementById('calMonth');
+      const calDate = document.getElementById('calDate');
+      if (calMonth && calDate) {
+        calMonth.textContent = date.toLocaleString('default', { month: 'short' });
+        calDate.textContent = date.getDate();
+      }
+    });
+  </script>
+</body>
+</html>
