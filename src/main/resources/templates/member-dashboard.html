@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script>
+    (function(){
+      try {
+        var raw = localStorage.getItem('memberUser');
+        var user = raw ? JSON.parse(raw) : null;
+        if (!user || (user.role && user.role !== 'MEMBER')) { window.location.replace('/login'); }
+      } catch (e) { window.location.replace('/login'); }
+    })();
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Member Dashboard | Royal Gym</title>
+  <link rel="stylesheet" href="/CSS/corporate-style.css">
+  <link rel="stylesheet" href="/CSS/dashboard-styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* ── Hero Banner ── */
+    .member-hero {
+      background: linear-gradient(135deg, rgba(10,16,32,0.9) 0%, rgba(20,35,70,0.85) 60%, rgba(10,16,32,0.9) 100%);
+      border-bottom: 1px solid rgba(245,158,11,0.2);
+      padding: 28px 0 20px;
+      margin-bottom: 28px;
+    }
+    .hero-inner {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 18px;
+    }
+    .hero-title {
+      font-size: 1.7rem;
+      font-weight: 800;
+      color: #f59e0b;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: -0.5px;
+    }
+    .hero-badge {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .hero-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1e3a5f, #0f296b);
+      border: 2px solid rgba(245,158,11,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      color: #f59e0b;
+    }
+    .hero-membership-pill {
+      padding: 6px 18px;
+      border-radius: 30px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+    .pill-active  { background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.4); color: #34d399; }
+    .pill-paid    { background: rgba(56,189,248,0.12); border: 1px solid rgba(56,189,248,0.4); color: #38bdf8; }
+    .pill-pending { background: rgba(148,163,184,0.1); border: 1px solid rgba(148,163,184,0.3); color: #94a3b8; }
+
+    /* ── Quick Stats Row ── */
+    .member-stats {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+    .stat-mini {
+      border-radius: 16px;
+      padding: 20px 22px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      transition: transform 0.2s, box-shadow 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .stat-mini::after {
+      content: '';
+      position: absolute;
+      top: 0; right: 0;
+      width: 60px; height: 60px;
+      border-radius: 50%;
+      opacity: 0.08;
+      filter: blur(20px);
+    }
+    .stat-mini.gold-card  { background: linear-gradient(135deg,rgba(20,30,55,0.97),rgba(15,22,42,0.95)); border: 1px solid rgba(245,158,11,0.25); border-top: 2px solid rgba(245,158,11,0.7); }
+    .stat-mini.blue-card  { background: linear-gradient(135deg,rgba(14,22,50,0.97),rgba(10,18,40,0.95)); border: 1px solid rgba(56,189,248,0.2);  border-top: 2px solid rgba(56,189,248,0.6); }
+    .stat-mini.green-card { background: linear-gradient(135deg,rgba(10,25,40,0.97),rgba(8,20,35,0.95));  border: 1px solid rgba(16,185,129,0.2);  border-top: 2px solid rgba(16,185,129,0.6); }
+    .stat-mini:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(0,0,0,0.4); }
+    .stat-mini-icon {
+      width: 48px; height: 48px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem; flex-shrink: 0;
+    }
+    .stat-mini-icon.gold  { background: linear-gradient(135deg,rgba(245,158,11,0.3),rgba(217,119,6,0.15)); color: #f59e0b; box-shadow: 0 4px 14px rgba(245,158,11,0.2); }
+    .stat-mini-icon.blue  { background: linear-gradient(135deg,rgba(56,189,248,0.25),rgba(14,165,233,0.1)); color: #38bdf8; box-shadow: 0 4px 14px rgba(56,189,248,0.2); }
+    .stat-mini-icon.green { background: linear-gradient(135deg,rgba(16,185,129,0.25),rgba(5,150,105,0.1)); color: #34d399; box-shadow: 0 4px 14px rgba(16,185,129,0.2); }
+    .stat-mini-val {
+      font-size: 1.5rem; font-weight: 800; color: #f0f9ff; line-height: 1;
+      margin-bottom: 4px; letter-spacing: -0.02em;
+    }
+    .stat-mini-lbl { font-size: 0.72rem; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.07em; }
+
+    /* ── Two-column layout ── */
+    .dash-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.15fr;
+      gap: 22px;
+      align-items: start;
+    }
+
+    /* ── BMI Calculator Button ── */
+    .bmi-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #fff;
+      background: linear-gradient(135deg, #8b5cf6, #6366f1);
+      border: 1px solid rgba(139,92,246,0.3);
+      padding: 10px 18px;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(99,102,241,0.25);
+      transition: all 0.25s;
+      letter-spacing: 0.03em;
+    }
+    .bmi-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(99,102,241,0.4);
+      background: linear-gradient(135deg, #a78bfa, #818cf8);
+    }
+
+
+    /* ── Icon action buttons — colored ── */
+    .action-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .action-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 9px;
+      padding: 18px 10px;
+      border-radius: 14px;
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 700;
+      transition: all 0.22s ease;
+      letter-spacing: 0.02em;
+    }
+    .action-card i { font-size: 1.3rem; }
+    /* Edit — blue */
+    .action-card.edit {
+      background: linear-gradient(135deg, rgba(56,189,248,0.15), rgba(14,165,233,0.08));
+      border: 1px solid rgba(56,189,248,0.35);
+      color: #38bdf8;
+    }
+    .action-card.edit:hover {
+      background: linear-gradient(135deg, rgba(56,189,248,0.28), rgba(14,165,233,0.18));
+      border-color: rgba(56,189,248,0.7);
+      box-shadow: 0 6px 20px rgba(56,189,248,0.2);
+      transform: translateY(-3px);
+      text-decoration: none;
+      color: #7dd3fc;
+    }
+    /* Password — gold */
+    .action-card.password {
+      background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(217,119,6,0.08));
+      border: 1px solid rgba(245,158,11,0.35);
+      color: #f59e0b;
+    }
+    .action-card.password:hover {
+      background: linear-gradient(135deg, rgba(245,158,11,0.28), rgba(217,119,6,0.18));
+      border-color: rgba(245,158,11,0.7);
+      box-shadow: 0 6px 20px rgba(245,158,11,0.2);
+      transform: translateY(-3px);
+      text-decoration: none;
+      color: #fcd34d;
+    }
+    /* Delete — red */
+    .action-card.danger {
+      background: linear-gradient(135deg, rgba(239,68,68,0.12), rgba(220,38,38,0.06));
+      border: 1px solid rgba(239,68,68,0.3);
+      color: #f87171;
+    }
+    .action-card.danger:hover {
+      background: linear-gradient(135deg, rgba(239,68,68,0.25), rgba(220,38,38,0.15));
+      border-color: rgba(239,68,68,0.6);
+      box-shadow: 0 6px 20px rgba(239,68,68,0.2);
+      transform: translateY(-3px);
+      text-decoration: none;
+      color: #fca5a5;
+    }
+
+    /* ── Membership progress bar ── */
+    .membership-meta { display: flex; flex-direction: column; gap: 14px; }
+    .mem-detail-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: rgba(0,0,0,0.2);
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .mem-detail-row .lbl { font-size: 0.78rem; color: rgba(255,255,255,0.45); text-transform: uppercase; letter-spacing: 0.05em; }
+    .mem-detail-row .val { font-size: 0.95rem; font-weight: 600; color: #f0f9ff; }
+    .progress-wrap {
+      margin-top: 4px;
+      background: rgba(0,0,0,0.25);
+      border-radius: 8px;
+      padding: 14px 16px;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.76rem;
+      color: rgba(255,255,255,0.45);
+      margin-bottom: 8px;
+    }
+    .progress-label span:last-child { color: #f59e0b; font-weight: 600; }
+    .progress-bar-track {
+      height: 6px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #38bdf8, #f59e0b);
+      border-radius: 10px;
+      transition: width 0.8s ease;
+    }
+
+    /* ── Motivational quote ── */
+    .quote-card {
+      margin-top: 22px;
+      background: linear-gradient(135deg, rgba(15,25,50,0.7), rgba(20,35,70,0.5));
+      border: 1px solid rgba(245,158,11,0.15);
+      border-left: 3px solid #f59e0b;
+      border-radius: 12px;
+      padding: 18px 22px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .quote-icon { font-size: 1.5rem; color: rgba(245,158,11,0.4); flex-shrink: 0; }
+    .quote-text { font-style: italic; color: rgba(255,255,255,0.6); font-size: 0.88rem; line-height: 1.6; }
+    .quote-text strong { color: rgba(245,158,11,0.85); font-style: normal; }
+
+    /* Profile grid tweak */
+    .profile-grid { grid-template-columns: repeat(2, 1fr) !important; }
+
+    @media (max-width: 900px) {
+      .dash-grid { grid-template-columns: 1fr; }
+      .member-stats { grid-template-columns: 1fr 1fr; }
+      .action-cards { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 540px) {
+      .member-stats { grid-template-columns: 1fr; }
+    }
+
+    /* ── MODALS ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 1000; align-items: center; justify-content: center;
+      opacity: 0;
+      transition: opacity 0.35s ease, backdrop-filter 0.35s ease;
+    }
+    .modal-overlay.open {
+      display: flex;
+      opacity: 1;
+    }
+    .modal-overlay.closing {
+      opacity: 0;
+      backdrop-filter: blur(0px);
+      pointer-events: none;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(40px) scale(0.94); opacity: 0; }
+      to   { transform: translateY(0)    scale(1);    opacity: 1; }
+    }
+    @keyframes slideDown {
+      from { transform: translateY(0)    scale(1);    opacity: 1; }
+      to   { transform: translateY(30px) scale(0.96); opacity: 0; }
+    }
+
+    /* ── BMI Gradient Bar ── */
+    .bmi-gradient-bar {
+      display: flex;
+      height: 22px;
+      border-radius: 11px;
+      margin-top: 4px;
+      overflow: hidden;
+      width: 100%;
+    }
+    .bmi-zone {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: rgba(0,0,0,0.7);
+      text-transform: uppercase;
+    }
+    .bmi-zone.under { background: #fcd34d; width: 25%; }
+    .bmi-zone.norm { background: #34d399; width: 25%; }
+    .bmi-zone.over { background: #fb923c; width: 25%; }
+    .bmi-zone.obese { background: #f87171; width: 25%; }
+    .bmi-marker-container {
+      position: relative;
+      height: 12px;
+      margin-top: 15px;
+      width: 100%;
+    }
+    .bmi-marker {
+      position: absolute;
+      top: 0;
+      left: 0; 
+      transform: translateX(-50%);
+      width: 0; height: 0;
+      border-left: 7px solid transparent;
+      border-right: 7px solid transparent;
+      border-bottom: 9px solid #fff;
+      transition: left 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      display: none;
+    }
+    .bmi-marker.show { display: block; }
+
+    .modal-content {
+      background: linear-gradient(160deg, rgba(20,30,55,0.78), rgba(12,18,35,0.75));
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(56,189,248,0.28);
+      border-top: 3px solid #38bdf8;
+      padding: 48px;
+      border-radius: 20px;
+      width: 760px;
+      max-width: 96%;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.55), 0 0 60px rgba(56,189,248,0.08), inset 0 1px 0 rgba(255,255,255,0.06);
+      position: relative;
+      animation: slideUp 0.38s cubic-bezier(0.22,1,0.36,1) both;
+    }
+    .modal-content.closing {
+      animation: slideDown 0.28s cubic-bezier(0.4,0,1,1) both;
+    }
+
+    .modal-content h3 {
+      color: #f0f9ff;
+      margin: 0 0 24px;
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: #cbd5e1;
+      font-size: 1.3rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+    }
+    .modal-close:hover {
+      background: rgba(239,68,68,0.2);
+      color: #f87171;
+      border-color: rgba(239,68,68,0.4);
+      transform: rotate(90deg);
+    }
+
+    .form-group {
+      margin-bottom: 22px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 0.9rem;
+      color: #cbd5e1;
+      margin-bottom: 8px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: #f0f9ff;
+      font-family: inherit;
+      font-size: 0.95rem;
+      outline: none;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(2px);
+    }
+
+    .form-group input::placeholder,
+    .form-group select::placeholder {
+      color: rgba(255,255,255,0.35);
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      background: rgba(255,255,255,0.05);
+      border-color: rgba(56,189,248,0.5);
+      box-shadow: 0 0 0 3px rgba(56,189,248,0.1), 0 0 20px rgba(56,189,248,0.15);
+      color: #f0f9ff;
+    }
+
+    .validation-error {
+      color: #f87171;
+      font-size: 0.8rem;
+      margin-top: 6px;
+      display: none;
+      font-weight: 500;
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 10px;
+      border: none;
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #38bdf8 100%);
+      color: #0c1222;
+      font-weight: 800;
+      font-size: 1.05rem;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+      margin-top: 12px;
+      box-shadow: 0 8px 24px rgba(245,158,11,0.3), 0 0 20px rgba(56,189,248,0.1);
+      letter-spacing: 0.5px;
+    }
+    .btn-submit:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 36px rgba(245,158,11,0.4), 0 0 30px rgba(56,189,248,0.2);
+      background: linear-gradient(135deg, #fcd34d 0%, #f97316 50%, #60a5fa 100%);
+    }
+
+    .btn-submit:active {
+      transform: translateY(-1px);
+    }
+    /* ── Profile Avatar & Photo Upload ── */
+    .avatar-wrap {
+      position: relative;
+      display: inline-block;
+    }
+    .avatar-img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid rgba(245,158,11,0.5);
+      display: block;
+      cursor: pointer;
+    }
+    .avatar-letter {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      border: 2px solid rgba(245,158,11,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: #fff;
+      cursor: pointer;
+    }
+    .avatar-camera-btn {
+      position: absolute;
+      bottom: -2px;
+      right: -4px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #f59e0b;
+      border: 2px solid #0c1222;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.8rem;
+      color: #0c1222;
+      transition: transform 0.2s, background 0.2s;
+      z-index: 5;
+    }
+    .avatar-camera-btn:hover { transform: scale(1.2); background: #fcd34d; }
+
+    /* Feedback target selector */
+    .fb-target-toggle {
+      display: flex;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      overflow: hidden;
+      width: 100%;
+      margin-bottom: 16px;
+    }
+    .fb-target-toggle button {
+      flex: 1;
+      padding: 10px;
+      background: transparent;
+      border: none;
+      color: rgba(255,255,255,0.5);
+      cursor: pointer;
+      font-size: 0.88rem;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .fb-target-toggle button.active {
+      background: rgba(245,158,11,0.2);
+      color: #f59e0b;
+      border-bottom: 2px solid #f59e0b;
+    }
+    .fb-trainer-picker {
+      display: none;
+      margin-bottom: 16px;
+    }
+    .fb-trainer-picker.visible { display: block; }
+
+    /* ============================================================
+       LIGHT MODE OVERRIDES - member-dashboard inline styles
+       ============================================================ */
+    body.light-mode .fb-target-toggle { background: #f1f5f9; border-color: #cbd5e1; }
+    body.light-mode .fb-target-toggle button { color: #64748b; }
+    body.light-mode .fb-target-toggle button:hover { color: #0f172a; }
+    body.light-mode .fb-target-toggle button.active { background: #fdf6e3; color: #d97706; border-bottom-color: #d97706; }
+
+    body.light-mode .hero-greeting h1 {
+      background: none;
+      -webkit-text-fill-color: #ffffff;
+      color: #ffffff;
+      text-transform: uppercase;
+      letter-spacing: -0.5px;
+    }
+    body.light-mode .hero-greeting p {
+      color: #9ca3af !important;
+    }
+    body.light-mode .pill-active  { background: #10b981; border: 1px solid #059669; color: #ffffff; border-radius: 20px; font-weight: 800; }
+    body.light-mode .pill-paid    { background: #3b82f6; border: 1px solid #2563eb; color: #ffffff; border-radius: 20px; font-weight: 800; }
+    body.light-mode .pill-pending { background: #f59e0b; border: 1px solid #d97706; color: #ffffff; border-radius: 20px; font-weight: 800; }
+    body.light-mode .bmi-btn {
+      background: transparent !important;
+      border: 1px solid #d1d5db !important;
+      color: #111827 !important;
+      box-shadow: none !important;
+      border-radius: 4px !important;
+    }
+    body.light-mode .bmi-btn:hover { background: #f3f4f6 !important; }
+    body.light-mode #onboardingTracker {
+      background: #ffffff !important;
+      border: 1px solid #e5e7eb !important;
+      border-left: 4px solid #111827 !important;
+      border-radius: 6px !important;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04) !important;
+    }
+    body.light-mode #onboardingTracker h3 { color: #111827 !important; text-transform: uppercase; }
+
+    /* Profile item cleanup for member-dashboard */
+    body.light-mode .profile-item {
+      margin-bottom: 0px;
+    }
+
+    body.light-mode .progress-wrap {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+    }
+    body.light-mode .progress-label {
+      color: #475569;
+    }
+    body.light-mode .progress-label span:last-child {
+      color: #d97706;
+    }
+    body.light-mode .progress-bar-track {
+      background: #cbd5e1;
+    }
+    
+    body.light-mode .modal-content h3,
+    body.light-mode .modal-content .modal-title-sync {
+      color: #0f172a !important;
+    }
+
+    /* ── Password input-wrap: eye icon inside ── */
+    .input-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .input-wrap input {
+      width: 100%;
+      padding-right: 46px; /* room for eye icon */
+    }
+    .pwtoggle {
+      position: absolute;
+      right: 14px;
+      color: rgba(255,255,255,0.4);
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: color 0.2s;
+      z-index: 2;
+      user-select: none;
+    }
+    .pwtoggle:hover { color: #38bdf8; }
+
+    /* Light mode: eye icon colour */
+    body.light-mode .pwtoggle { color: #64748b; }
+    body.light-mode .pwtoggle:hover { color: #0284c7; }
+
+    /* Light mode: form labels inside modal */
+    body.light-mode .modal-content .form-group label { color: #374151; }
+
+    /* Light mode: form inputs inside modal */
+    body.light-mode .modal-content .form-group input,
+    body.light-mode .modal-content .form-group select {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      color: #0f172a;
+    }
+    body.light-mode .modal-content .form-group input::placeholder { color: #94a3b8; }
+    body.light-mode .modal-content .form-group input:focus,
+    body.light-mode .modal-content .form-group select:focus {
+      background: #ffffff;
+      border-color: #38bdf8;
+      color: #0f172a;
+    }
+
+  </style>
+</head>
+
+<body class="dashboard-dark">
+
+  <!-- Nav -->
+  <nav class="top-nav">
+    <div class="nav-container">
+      <div class="nav-left">
+        <h2><i class="fas fa-dumbbell"></i> Royal Gym</h2>
+        <a href="/complaint-form" class="nav-link"><i class="fas fa-exclamation-circle"></i> Complaints</a>
+        <a href="#" class="nav-link" onclick="openFeedbackModal(); return false;"><i class="fas fa-star" style="color:#f59e0b;"></i> Rate Us</a>
+      </div>
+      <div class="nav-center">
+        <div class="welcome-message">
+          <i class="fas fa-user-circle"></i>
+          <span id="welcomeText">Welcome, <span id="userName">Member</span></span>
+        </div>
+      </div>
+      <div class="nav-right">
+        <div class="notifications" style="display:flex; align-items:center; gap:12px;">
+          <button id="themeToggleBtn" class="icon-button" style="color:#a5b4fc;" onclick="toggleTheme()" title="Toggle Light/Dark Theme">
+            <i class="fas fa-moon"></i>
+          </button>
+          <button class="bmi-btn" onclick="openBmiModal()"><i class="fas fa-calculator"></i> BMI Check</button>
+          <button class="icon-button" onclick="toggleNotificationDropdown(event)">
+            <i class="fas fa-bell"></i>
+            <span class="notification-badge" id="notificationCount" style="display:none;">0</span>
+          </button>
+        </div>
+        <button class="btn btn-danger" onclick="logout()">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Notifications Dropdown (Member) -->
+  <div id="notificationDropdown" class="deletion-bell-dropdown" style="display:none;">
+    <div class="deletion-bell-header">
+      <i class="fas fa-bell"></i> Notifications
+    </div>
+    <div id="notificationBody" class="deletion-bell-body">
+      <div style="text-align:center; padding: 20px; color: rgba(255,255,255,0.5);">Loading...</div>
+    </div>
+  </div>
+
+  <!-- Hero Banner -->
+  <div class="member-hero">
+    <div class="hero-inner">
+      <div class="hero-greeting">
+        <h1 id="heroName">Welcome back! 👋</h1>
+        <p id="heroSub">Great to see you. Keep pushing your limits.</p>
+      </div>
+      <div class="hero-badge">
+        <div class="avatar-wrap" id="heroAvatarWrap">
+          <!-- Filled dynamically by JS -->
+          <div class="avatar-letter" id="heroAvatarEl" style="background:#1e3a5f;" onclick="viewFullProfilePhoto()"><i class="fas fa-user" style="font-size:1.8rem; color:#f59e0b;"></i></div>
+          <div class="avatar-camera-btn" onclick="document.getElementById('photoUploadInput').click()" title="Upload profile photo">
+            <i class="fas fa-camera"></i>
+          </div>
+          <input type="file" id="photoUploadInput" accept="image/*" style="display:none;" onchange="handleAvatarUpload(event)">
+        </div>
+        <span class="hero-membership-pill pill-pending" id="heroPill">Pending</span>
+      </div>
+    </div>
+  </div>
+
+  <main class="main-content" style="padding-top:0;">
+    <div class="container">
+
+      <!-- Onboarding Progress Tracker -->
+      <div id="onboardingTracker" style="display:none; background:linear-gradient(135deg, rgba(15,25,50,0.8), rgba(20,35,70,0.7)); border:1px solid rgba(56,189,248,0.3); border-left:4px solid #38bdf8; border-radius:12px; padding:20px 30px; margin-bottom:24px; animation:fadeUpAnim 0.5s ease both;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+          <h3 style="font-size:1.1rem; color:#f0f9ff; margin:0;"><i class="fas fa-flag-checkered" style="color:#38bdf8; margin-right:8px;"></i> Welcome! Let's get you set up.</h3>
+          <span style="font-size:0.8rem; color:#38bdf8; font-weight:700; background:rgba(56,189,248,0.15); padding:4px 12px; border-radius:20px; text-transform:uppercase; letter-spacing:1px;">Onboarding</span>
+        </div>
+        <div style="display:flex; align-items:center; justify-content:space-between; position:relative; max-width:600px; margin:0 auto;">
+          <!-- Connecting Line -->
+          <div style="position:absolute; top:20px; left:30px; right:30px; height:3px; background:rgba(255,255,255,0.08); z-index:1; border-radius:2px;">
+            <div id="trackerLine" style="height:100%; width:0%; background:#10b981; transition:width 0.8s ease; border-radius:2px; box-shadow:0 0 10px rgba(16,185,129,0.5);"></div>
+          </div>
+          
+          <!-- Step 1: Registered -->
+          <div style="display:flex; flex-direction:column; align-items:center; z-index:2; gap:10px;">
+            <div id="step1Circle" style="width:44px; height:44px; border-radius:50%; background:#10b981; border:2px solid #10b981; display:flex; align-items:center; justify-content:center; color:#fff; font-size:1.1rem; box-shadow:0 0 15px rgba(16,185,129,0.4);"><i class="fas fa-check"></i></div>
+            <span style="font-size:0.85rem; color:#f0f9ff; font-weight:700;">Account Created</span>
+          </div>
+
+          <!-- Step 2: Payment -->
+          <div style="display:flex; flex-direction:column; align-items:center; z-index:2; gap:10px;">
+            <div id="step2Circle" style="width:44px; height:44px; border-radius:50%; background:#0f172a; border:2px solid rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center; color:rgba(255,255,255,0.4); font-size:1.1rem; transition:all 0.5s;"><i class="fas fa-credit-card"></i></div>
+            <span style="font-size:0.85rem; color:rgba(255,255,255,0.5); font-weight:600;" id="step2Text">Select Package</span>
+          </div>
+
+          <!-- Step 3: Approval -->
+          <div style="display:flex; flex-direction:column; align-items:center; z-index:2; gap:10px;">
+            <div id="step3Circle" style="width:44px; height:44px; border-radius:50%; background:#0f172a; border:2px solid rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center; color:rgba(255,255,255,0.4); font-size:1.1rem; transition:all 0.5s;"><i class="fas fa-user-check"></i></div>
+            <span style="font-size:0.85rem; color:rgba(255,255,255,0.5); font-weight:600;" id="step3Text">Admin Approval</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Stats Row -->
+      <div class="member-stats">
+        <div class="stat-mini gold-card">
+          <div class="stat-mini-icon gold"><i class="fas fa-calendar-alt"></i></div>
+          <div>
+            <div class="stat-mini-val" id="statDaysLeft">—</div>
+            <div class="stat-mini-lbl">Days Remaining</div>
+          </div>
+        </div>
+        <div class="stat-mini blue-card">
+          <div class="stat-mini-icon blue"><i class="fas fa-id-card"></i></div>
+          <div>
+            <div class="stat-mini-val" id="statPlan">—</div>
+            <div class="stat-mini-lbl">Plan Type</div>
+          </div>
+        </div>
+        <div class="stat-mini green-card">
+          <div class="stat-mini-icon green"><i class="fas fa-trophy"></i></div>
+          <div>
+            <div class="stat-mini-val" id="statMemberId">—</div>
+            <div class="stat-mini-lbl">Member ID</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Motivational Quote (above main content) -->
+      <div class="quote-card" style="margin-bottom:22px;margin-top:0;">
+        <div class="quote-icon"><i class="fas fa-quote-left"></i></div>
+        <div class="quote-text" id="quoteText">Loading quote...</div>
+      </div>
+
+      <!-- Two-column main area -->
+      <div class="dash-grid">
+
+        <!-- LEFT: Personal Details -->
+        <div>
+          <div class="card">
+            <div class="card-header">
+              <h3><i class="fas fa-user"></i> Personal Details</h3>
+            </div>
+            <div class="card-body">
+              <div class="profile-grid" id="personalDetails">
+                <div class="profile-item">
+                  <label>Full Name</label>
+                  <div class="profile-value" id="profileName">Loading...</div>
+                </div>
+                <div class="profile-item">
+                  <label>Email Address</label>
+                  <div class="profile-value" id="profileEmail">Loading...</div>
+                </div>
+                <div class="profile-item">
+                  <label>Gender</label>
+                  <div class="profile-value" id="profileGender">Loading...</div>
+                </div>
+                <div class="profile-item">
+                  <label>Age</label>
+                  <div class="profile-value" id="profileAge">Loading...</div>
+                </div>
+                <div class="profile-item">
+                  <label>City</label>
+                  <div class="profile-value" id="profileCity">Loading...</div>
+                </div>
+                <div class="profile-item">
+                  <label>Phone Number</label>
+                  <div class="profile-value" id="profilePhone">Loading...</div>
+                </div>
+                <div class="profile-item" style="grid-column: span 2;">
+                  <label>Address</label>
+                  <div class="profile-value" id="profileAddress">Loading...</div>
+                </div>
+              </div>
+
+              <!-- Icon action cards -->
+              <div class="action-cards">
+                <a href="#" class="action-card edit" onclick="openEditModal(); return false;">
+                  <i class="fas fa-edit"></i>
+                  Edit Details
+                </a>
+                <a href="#" class="action-card password" onclick="openPassModal(); return false;">
+                  <i class="fas fa-key"></i>
+                  Change Password
+                </a>
+                <a href="#" class="action-card danger" onclick="requestDeleteAccount(); return false;">
+                  <i class="fas fa-trash-alt"></i>
+                  Request Delete
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: Membership -->
+        <div>
+          <div class="card">
+            <div class="card-header">
+              <h3><i class="fas fa-id-card"></i> Membership</h3>
+            </div>
+            <div class="card-body">
+              <div id="membershipDisplay">
+                <div class="no-membership">
+                  <i class="fas fa-info-circle"></i>
+                  <p>No membership activated yet. Please activate a membership package.</p>
+                </div>
+              </div>
+              <div class="packages-grid" id="packagesSection">
+                <div class="package-card">
+                  <div class="package-header">
+                    <h3>Monthly</h3>
+                    <div class="price">Rs. 3,500<span>/month</span></div>
+                  </div>
+                  <div class="package-features">
+                    <ul>
+                      <li><i class="fas fa-check"></i> 24/7 Gym Access</li>
+                      <li><i class="fas fa-check"></i> Basic Equipment</li>
+                      <li><i class="fas fa-check"></i> Locker Room Access</li>
+                      <li><i class="fas fa-check"></i> Flexible monthly commitment</li>
+                    </ul>
+                  </div>
+                  <div class="package-actions">
+                    <button class="btn btn-outline" onclick="redirectToPayment('monthly', 3500)">Activate</button>
+                  </div>
+                </div>
+                <div class="package-card featured">
+                  <div class="package-header">
+                    <h3>Quarterly</h3>
+                    <div class="price">Rs. 9,500<span>/3 months</span></div>
+                    <div class="featured-badge">Save 10%</div>
+                  </div>
+                  <div class="package-features">
+                    <ul>
+                      <li><i class="fas fa-check"></i> Everything in Monthly</li>
+                      <li><i class="fas fa-check"></i> Group Classes Access</li>
+                      <li><i class="fas fa-check"></i> Better value</li>
+                      <li><i class="fas fa-check"></i> Rs. 3,167/month effective</li>
+                    </ul>
+                  </div>
+                  <div class="package-actions">
+                    <button class="btn btn-primary" onclick="redirectToPayment('quarterly', 9500)">Activate</button>
+                  </div>
+                </div>
+                <div class="package-card">
+                  <div class="package-header">
+                    <h3>Annually</h3>
+                    <div class="price">Rs. 32,000<span>/year</span></div>
+                    <div class="featured-badge" style="background:rgba(99,102,241,0.2);border-color:rgba(99,102,241,0.4);color:#818cf8;">Best Value</div>
+                  </div>
+                  <div class="package-features">
+                    <ul>
+                      <li><i class="fas fa-check"></i> Everything in Quarterly</li>
+                      <li><i class="fas fa-check"></i> Best value for money</li>
+                      <li><i class="fas fa-check"></i> Rs. 2,667/month effective</li>
+                      <li><i class="fas fa-check"></i> Priority support</li>
+                    </ul>
+                  </div>
+                  <div class="package-actions">
+                    <button class="btn btn-outline" onclick="redirectToPayment('annually', 32000)">Activate</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Classes Card -->
+          <div class="card" style="margin-top:22px;">
+            <div class="card-header">
+              <h3><i class="fas fa-calendar-check" style="color:#f59e0b;"></i> My Scheduled Classes</h3>
+            </div>
+            <div class="card-body">
+              <div id="myClassesDisplay">
+                <div style="text-align:center; padding: 20px; color: rgba(255,255,255,0.5);">
+                  <i class="fas fa-spinner fa-spin"></i> Loading your classes...
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /dash-grid -->
+    </div>
+  </main>
+
+  <!-- MODALS -->
+  <!-- Edit Details Modal -->
+  <div class="modal-overlay" id="editModal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeEditModal()"><i class="fas fa-times"></i></button>
+      <h3><i class="fas fa-user-edit"></i> Edit Profile</h3>
+      <form id="editForm" onsubmit="handleEditSubmit(event)" novalidate>
+        <!-- Email — read only -->
+        <div class="form-group">
+          <label style="display:flex;align-items:center;gap:6px;">
+            <i class="fas fa-lock" style="font-size:0.8rem;color:rgba(255,255,255,0.35);"></i>
+            Email Address <span style="margin-left:6px;font-size:0.72rem;font-weight:500;color:rgba(255,255,255,0.35);border:1px solid rgba(255,255,255,0.12);border-radius:20px;padding:2px 8px;">Cannot be changed</span>
+          </label>
+          <input type="email" id="editEmail" readonly disabled
+            style="opacity:0.55; cursor:not-allowed; background:rgba(255,255,255,0.02); border-color:rgba(255,255,255,0.07);">
+        </div>
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="editName" required minlength="4">
+          <div class="validation-error" id="errName">Letters only, min 4 chars.</div>
+        </div>
+        <div class="form-group" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div>
+            <label>Age</label>
+            <input type="number" id="editAge" required min="18" max="70">
+            <div class="validation-error" id="errAge" style="font-size:0.7rem;">Between 18 and 100.</div>
+          </div>
+          <div>
+            <label>Phone Number</label>
+            <input type="text" id="editPhone" required pattern="[0-9]{10}">
+            <div class="validation-error" id="errPhone" style="font-size:0.7rem;">10 digit number.</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>City</label>
+          <input type="text" id="editCity" required>
+          <div class="validation-error" id="errCity">Letters only, min 2 chars.</div>
+        </div>
+        <div class="form-group">
+          <label>Home Address</label>
+          <input type="text" id="editAddress" required>
+          <div class="validation-error" id="errAddress">Min 5 chars.</div>
+        </div>
+        <button type="submit" class="btn-submit" id="btnSaveEdit" style="background: linear-gradient(135deg, #38bdf8, #0284c7); color: #fff;">Save Changes</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Change Password Modal -->
+  <div class="modal-overlay" id="passModal">
+    <div class="modal-content" style="max-width: 550px; padding: 40px;">
+      <button class="modal-close" onclick="closePassModal()"><i class="fas fa-times"></i></button>
+      <h3 class="modal-title-sync"><i class="fas fa-key"></i> Change Password</h3>
+      <form id="passForm" onsubmit="handlePassSubmit(event)" novalidate>
+        <div class="form-group">
+          <label>Current Password</label>
+          <div class="input-wrap">
+            <input type="password" id="currentPass" required>
+            <i class="fas fa-eye pwtoggle" onclick="togglePasswordVisibility('currentPass', this)"></i>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>New Password</label>
+          <div class="input-wrap">
+            <input type="password" id="newPass" autocomplete="new-password" required minlength="6">
+            <i class="fas fa-eye pwtoggle" onclick="togglePasswordVisibility('newPass', this)"></i>
+          </div>
+          <div id="dashPwStrength" style="font-size:0.82rem; margin-top:6px; font-weight:600; min-height:18px; transition:color 0.3s;"></div>
+        </div>
+        <div class="form-group">
+          <label>Confirm New Password</label>
+          <div class="input-wrap">
+            <input type="password" id="confirmPass" required minlength="6">
+            <i class="fas fa-eye pwtoggle" onclick="togglePasswordVisibility('confirmPass', this)"></i>
+          </div>
+          <div class="validation-error" id="matchErr">Passwords do not match.</div>
+        </div>
+        <div class="validation-error" id="passServerErr" style="margin-bottom:10px; font-size:0.9rem;"></div>
+        <button type="submit" class="btn-submit" id="btnSavePass" style="background: #0ea5e9; box-shadow: 0 4px 15px rgba(14,165,233,0.3); padding: 16px;">Update Password</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Feedback Modal -->
+  <div class="modal-overlay" id="feedbackModal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeFeedbackModal()"><i class="fas fa-times"></i></button>
+      <h3 style="color:#10b981;"><i class="fas fa-star" style="color:#10b981; margin-right:8px;"></i> Leave Feedback</h3>
+
+      <!-- Target selector -->
+      <div class="fb-target-toggle">
+        <button id="fbBtnGym" class="active" onclick="setFeedbackTarget('GYM')">
+          <i class="fas fa-dumbbell"></i> &nbsp;Royal Gym (General)
+        </button>
+        <button id="fbBtnTrainer" onclick="setFeedbackTarget('TRAINER')">
+          <i class="fas fa-user-tie"></i> &nbsp;A Specific Trainer
+        </button>
+      </div>
+
+      <form id="feedbackForm" onsubmit="submitFeedback(event)">
+        <input type="hidden" id="fbTargetType" value="GYM">
+        <input type="hidden" id="fbTrainerId" value="">
+
+        <!-- Trainer picker (shown only when TRAINER target is selected) -->
+        <div class="form-group fb-trainer-picker" id="fbTrainerPickerWrap">
+          <label><i class="fas fa-user-tie" style="color:#c084fc; margin-right:6px;"></i> Choose Trainer</label>
+          <select id="fbTrainerSelect" onchange="onTrainerSelectChange()" style="background:rgba(0,0,0,0.35); border:1px solid rgba(192,132,252,0.35); color:#f0f9ff;">
+            <option value="">— Loading trainers… —</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Rating</label>
+          <select id="fbRating" required style="background:rgba(0,0,0,0.35); border:1px solid rgba(245,158,11,0.3); color:#f0f9ff;">
+            <option value="5">⭐⭐⭐⭐⭐ Excellent (5/5)</option>
+            <option value="4">⭐⭐⭐⭐ Good (4/5)</option>
+            <option value="3">⭐⭐⭐ Average (3/5)</option>
+            <option value="2">⭐⭐ Fair (2/5)</option>
+            <option value="1">⭐ Poor (1/5)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label style="display:flex; justify-content:space-between; align-items:center;">
+            <span>Your Comments <span style="font-size:0.75rem; font-weight:500; color:rgba(255,255,255,0.4); border:1px solid rgba(255,255,255,0.15); border-radius:20px; padding:2px 8px; margin-left:6px;">Optional</span></span>
+            <span id="fbCommentCount" style="font-size:0.76rem; color:rgba(255,255,255,0.35); transition:color 0.2s;"></span>
+          </label>
+          <textarea id="fbComment" rows="4" style="width:100%; padding:10px; border-radius:8px; background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.15); color:#fff; font-family:inherit; transition:border-color 0.2s;" placeholder="Share your experience (optional, min. 20 characters if provided)..."></textarea>
+          <div id="fbCommentErr" style="color:#f87171; font-size:0.8rem; margin-top:5px; display:none;">Comment must be at least 20 characters.</div>
+        </div>
+        <div class="form-group" style="display:flex; align-items:center; gap:10px;">
+          <input type="checkbox" id="fbAnonymous" style="width:auto; height:18px; cursor:pointer; padding:0;">
+          <label for="fbAnonymous" style="margin:0; font-size:0.9rem; cursor:pointer;">Post Anonymously (Hide my name)</label>
+        </div>
+
+        <button type="submit" class="btn-submit" style="background: linear-gradient(135deg, #10b981, #059669); color: #fff;">
+          <i class="fas fa-paper-plane" style="margin-right:6px;"></i> Submit Feedback
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- BMI Calculator Modal -->
+  <div class="modal-overlay" id="bmiModal">
+    <div class="modal-content" style="max-width: 500px; padding: 40px; border-top-color: #8b5cf6;">
+      <button class="modal-close" onclick="closeBmiModal()"><i class="fas fa-times"></i></button>
+      <h3 style="color:#a78bfa; font-size: 1.6rem; margin-bottom: 24px;">
+        <i class="fas fa-weight" style="color:#a78bfa; margin-right:8px;"></i> BMI Calculator
+      </h3>
+      <form id="bmiForm" onsubmit="calculateBMI(event)">
+        <!-- Age & Units Container -->
+        <div class="form-group" style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:15px;">
+          <div>
+            <label>Age</label>
+            <input type="number" id="bmiAge" min="10" max="100" placeholder="e.g. 25" required>
+          </div>
+          <div>
+            <label>Units</label>
+            <select id="bmiUnits" onchange="toggleBmiUnits()">
+              <option value="imperial" selected>Imperial (lb, ft/in)</option>
+              <option value="metric">Metric (kg, cm)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Height & Weight Container -->
+        <div class="form-group" style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:5px;">
+          <div id="unitHeightGroup">
+            <label id="bmiHeightLabel">Height (ft / in)</label>
+            <!-- Metric Height -->
+            <input type="number" id="bmiHeightCm" step="0.1" min="50" max="250" placeholder="e.g. 175" style="display:none;">
+            <!-- Imperial Height -->
+            <div id="bmiHeightImperial" style="display:flex; gap:10px;">
+              <input type="number" id="bmiHeightFt" step="1" min="3" max="8" placeholder="ft" required>
+              <input type="number" id="bmiHeightIn" step="1" min="0" max="11" placeholder="in" required>
+            </div>
+          </div>
+          <div id="unitWeightGroup">
+            <label id="bmiWeightLabel">Weight (lbs)</label>
+            <!-- Metric Weight -->
+            <input type="number" id="bmiWeightKg" step="0.1" min="20" max="300" placeholder="e.g. 70" style="display:none;">
+            <!-- Imperial Weight -->
+            <input type="number" id="bmiWeightLbs" step="0.1" min="40" max="600" placeholder="e.g. 150" required>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div style="display:flex; gap:12px; margin-top:24px;">
+          <button type="submit" class="btn-submit" style="margin-top:0; flex:1; background: linear-gradient(135deg, #8b5cf6, #6366f1); box-shadow: 0 4px 15px rgba(99,102,241,0.3);">
+            Calculate
+          </button>
+          <button type="button" class="btn-submit" onclick="clearBmiForm()" style="margin-top:0; flex:1;">
+            Clear
+          </button>
+        </div>
+        
+        <!-- BMI Result Display -->
+        <div id="bmiResultBox" style="margin-top:30px; text-align:center;">
+          <div style="font-size:1.6rem; font-weight:800; margin-bottom:4px; transition:opacity 0.3s;" id="bmiResultTitle">Result</div>
+          <div style="font-size:1rem; margin-bottom:4px;">BMI = <span id="bmiValue" style="font-weight:700;">--</span></div>
+          <div id="bmiCategoryText" style="font-size:0.9rem; font-weight:600; text-transform:uppercase; margin-bottom:12px;">(--)</div>
+          
+          <div class="bmi-marker-container">
+            <div class="bmi-marker" id="bmiMarker"></div>
+          </div>
+          <div class="bmi-gradient-bar">
+            <div class="bmi-zone under">Underweight</div>
+            <div class="bmi-zone norm">Normal</div>
+            <div class="bmi-zone over">Overweight</div>
+            <div class="bmi-zone obese">Obesity</div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Photo View Modal -->
+  <div class="modal-overlay" id="photoViewModal">
+    <div style="position:relative; max-width:90%; max-height:90%; border-radius:12px; overflow:hidden; box-shadow:0 10px 40px rgba(0,0,0,0.8);">
+      <button class="modal-close" onclick="closePhotoViewModal()" style="position:absolute; top:10px; right:10px; background:rgba(0,0,0,0.6); color:#fff; border-radius:50%; width:36px; height:36px; border:none; cursor:pointer;"><i class="fas fa-times"></i></button>
+      <img id="fullSizePhoto" src="" alt="Profile Photo" style="display:block; max-width:80vw; max-height:80vh; object-fit:contain;">
+    </div>
+  </div>
+
+  <script src="/JS/custom-alerts.js"></script>
+  <script src="/JS/member-dashboard.js"></script>
+</body>
+</html>

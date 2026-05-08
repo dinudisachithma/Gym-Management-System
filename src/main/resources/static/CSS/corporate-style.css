@@ -1,0 +1,88 @@
+/* Royal Gym – shared base styles for dashboard pages */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+    --dark: #0b1120;
+    --charcoal: #111827;
+    --warm: #1f2937;
+    --accent: #0ea5e9;
+    --accent-green: #10b981;
+    --accent-orange: #f59e0b;
+    --accent-teal: #0d9488;
+    --white: #f8fafc;
+    --muted: rgba(255, 255, 255, 0.65);
+    --border: rgba(255, 255, 255, 0.08);
+    --ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+html { scroll-behavior: smooth; }
+body {
+    transition: background-color 0.35s ease, color 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+}
+
+body.dashboard-dark {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    color: var(--white);
+    min-height: 100vh;
+    background:
+        radial-gradient(ellipse 80% 50% at 20% 0%,   rgba(15,23,42,0.4) 0%, transparent 70%),
+        radial-gradient(ellipse 60% 40% at 80% 100%, rgba(30,41,59,0.2)  0%, transparent 60%),
+        radial-gradient(ellipse 100% 100% at 50% 50%, #0b1120 40%, #060910 100%);
+    background-attachment: fixed;
+    -webkit-font-smoothing: antialiased;
+}
+
+@keyframes fadeUpAnim {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+a { color: var(--accent); text-decoration: none; transition: color 0.2s; }
+a:hover { text-decoration: underline; }
+
+/* ── Dark dropdown fix (browser native options) ── */
+select {
+    background: rgba(15, 23, 42, 0.95);
+    color: #f0f9ff;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 7px;
+    padding: 6px 12px;
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+select option {
+    background: #0f172a;
+    color: #f0f9ff;
+}
+select option:hover,
+select option:checked {
+    background: #1e3a5f;
+    color: #f59e0b;
+}
+
+/* Global Fix for Chrome Autofill white background in dark theme */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active {
+    transition: background-color 5000s ease-in-out 0s !important;
+    -webkit-text-fill-color: #fff !important;
+}
+
+body.light-mode {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    color: #0f172a !important;
+    /* Clean Royal Gym light mode */
+    background: linear-gradient(160deg, #f8f9fa 0%, #ffffff 50%, #fffdf0 100%) !important;
+    background-attachment: fixed !important;
+}
+
+/* Fix autofill in light mode — text must be dark */
+body.light-mode input:-webkit-autofill,
+body.light-mode input:-webkit-autofill:hover,
+body.light-mode input:-webkit-autofill:focus,
+body.light-mode input:-webkit-autofill:active {
+    -webkit-text-fill-color: #0f172a !important;
+    caret-color: #0f172a !important;
+}
