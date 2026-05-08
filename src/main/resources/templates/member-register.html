@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Account | Royal Gym</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/CSS/member-register.css">
+</head>
+<body>
+<div class="reg-split">
+  <!-- Left visual -->
+  <div class="reg-visual">
+    <div class="reg-visual-content">
+    </div>
+  </div>
+
+  <!-- Right form panel -->
+  <div class="reg-form-panel">
+    <div class="logo">
+      <i class="fas fa-dumbbell"></i>
+      <h1>Royal Gym</h1>
+    </div>
+    <h3>Create Account</h3>
+    <p class="sub">Fill in your details to get started.</p>
+
+    <form id="registerForm" novalidate>
+      <div class="form-grid">
+        <!-- Full Name -->
+        <div class="form-group form-full">
+          <label for="fullName">Full Name</label>
+          <div class="input-wrap">
+            <i class="fas fa-user"></i>
+            <input type="text" id="fullName" placeholder="John Silva" autocomplete="name">
+          </div>
+          <div class="error-message" id="fullNameError"></div>
+        </div>
+
+        <!-- Email -->
+        <div class="form-group form-full">
+          <label for="email">Email Address</label>
+          <div class="input-wrap">
+            <i class="fas fa-envelope"></i>
+            <input type="email" id="email" placeholder="you@example.com" autocomplete="email">
+          </div>
+          <div class="error-message" id="emailError"></div>
+        </div>
+
+        <!-- Gender -->
+        <div class="form-group">
+          <label for="gender">Gender</label>
+          <div class="input-wrap">
+            <i class="fas fa-venus-mars"></i>
+            <select id="gender">
+              <option value="">Select</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="error-message" id="genderError"></div>
+        </div>
+
+        <!-- Age -->
+        <div class="form-group">
+          <label for="age">Age</label>
+          <div class="input-wrap">
+            <i class="fas fa-calendar"></i>
+            <input type="number" id="age" placeholder="25" min="18">
+          </div>
+          <div class="error-message" id="ageError"></div>
+        </div>
+
+        <!-- City -->
+        <div class="form-group">
+          <label for="city">City</label>
+          <div class="input-wrap">
+            <i class="fas fa-city"></i>
+            <input type="text" id="city" placeholder="Colombo">
+          </div>
+          <div class="error-message" id="cityError"></div>
+        </div>
+
+        <!-- Phone -->
+        <div class="form-group">
+          <label for="phone">Phone</label>
+          <div class="input-wrap">
+            <i class="fas fa-phone"></i>
+            <input type="tel" id="phone" placeholder="077 123 4567" autocomplete="tel">
+          </div>
+          <div class="error-message" id="phoneError"></div>
+        </div>
+
+        <!-- Address -->
+        <div class="form-group form-full">
+          <label for="address">Address</label>
+          <div class="input-wrap">
+            <i class="fas fa-map-marker-alt"></i>
+            <input type="text" id="address" placeholder="123 Main Street, Colombo">
+          </div>
+          <div class="error-message" id="addressError"></div>
+        </div>
+
+        <!-- Password -->
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="input-wrap">
+            <i class="fas fa-lock"></i>
+            <input type="password" id="password" placeholder="Min. 6 chars, one uppercase" autocomplete="new-password">
+            <i class="fas fa-eye pwtoggle" onclick="togglePw('password')"></i>
+          </div>
+          <div class="password-strength" id="pwStrength"></div>
+          <div class="error-message" id="passwordError"></div>
+        </div>
+
+        <!-- Confirm Password -->
+        <div class="form-group">
+          <label for="confirmPassword">Confirm Password</label>
+          <div class="input-wrap">
+            <i class="fas fa-lock"></i>
+            <input type="password" id="confirmPassword" placeholder="Repeat password" autocomplete="new-password">
+            <i class="fas fa-eye pwtoggle" onclick="togglePw('confirmPassword')"></i>
+          </div>
+          <div class="error-message" id="confirmPasswordError"></div>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-register">
+        <i class="fas fa-user-plus"></i> Create Account
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      <p>Already a member? <a href="/login">Sign in</a></p>
+      <a href="/" class="back-link"><i class="fas fa-arrow-left" style="margin-right:4px;"></i> Back to Home</a>
+    </div>
+  </div>
+</div>
+  <script src="/JS/custom-alerts.js"></script>
+  <script src="/JS/member-register.js"></script>
+</body>
+</html>

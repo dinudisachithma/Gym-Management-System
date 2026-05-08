@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Profile | Royal Gym</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/CSS/corporate-style.css">
+  <link rel="stylesheet" href="/CSS/dashboard-styles.css">
+  <style>
+    .edit-container { max-width: 760px; margin: 40px auto; padding: 0 24px; }
+    .edit-card { background: rgba(18,26,42,0.85); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); border-top: 2px solid #38bdf8; box-shadow: 0 12px 30px rgba(0,0,0,0.5), 0 0 25px rgba(56,189,248,0.15); border-radius: 14px; padding: 40px; }
+    .edit-card h2 { font-size: 1.3rem; font-weight: 600; color: #fff; margin-bottom: 6px; }
+    .edit-card .sub { color: rgba(255,255,255,0.5); font-size: 0.9rem; margin-bottom: 32px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .form-full { grid-column: 1 / -1; }
+    .form-group label { display: block; font-size: 0.82rem; font-weight: 600; color: rgba(255,255,255,0.6); margin-bottom: 7px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .form-group input, .form-group select {
+      width: 100%; padding: 12px 14px;
+      background: rgba(0,0,0,0.25);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 8px; color: #fff; font-size: 0.95rem;
+      font-family: inherit; outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-group select option { background: #121a2a; color: #fff; }
+    .form-group input:focus, .form-group select:focus { border-color: #38bdf8; box-shadow: 0 0 0 2px rgba(56,189,248,0.2); }
+    .form-group input::placeholder { color: rgba(255,255,255,0.25); }
+    .form-actions { display: flex; gap: 12px; margin-top: 32px; }
+    .btn-save { flex: 1; padding: 13px; background: #38bdf8; color: #0c1222; border: none; border-radius: 8px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: background 0.2s; }
+    .btn-save:hover { background: #0ea5e9; }
+    .btn-back { padding: 13px 24px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.7); border-radius: 8px; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; }
+    .btn-back:hover { background: rgba(255,255,255,0.1); }
+    @media(max-width:600px) { .form-grid { grid-template-columns: 1fr; } }
+
+    /* LIGHT MODE OVERRIDES */
+    body.light-mode { background: #eef2f6 !important; }
+    body.light-mode .edit-card {
+      background: #ffffff;
+      backdrop-filter: none;
+      border: 1px solid #cbd5e1;
+      border-top: 4px solid #1d4ed8;
+      box-shadow: 0 4px 12px rgba(15,23,42,0.06);
+    }
+    body.light-mode .edit-card h2, body.light-mode .edit-card i.fa-user-edit { color: #0f172a !important; }
+    body.light-mode .edit-card .sub { color: #64748b; }
+    body.light-mode .form-group label { color: #334155; }
+    body.light-mode .form-group label span { color: #64748b !important; font-weight: 600 !important; }
+    body.light-mode .form-group input, body.light-mode .form-group select {
+      background: #ffffff;
+      border: 1px solid #94a3b8;
+      color: #0f172a;
+      font-weight: 700;
+      box-shadow: inset 0 1px 3px rgba(15,23,42,0.05);
+    }
+    body.light-mode .form-group input:focus, body.light-mode .form-group select:focus { border-color: #1d4ed8; box-shadow: 0 0 0 2px rgba(29,78,216,0.15); }
+    body.light-mode .form-group input::placeholder { color: #94a3b8; font-weight: 500; }
+    body.light-mode .form-group select option { background: #ffffff; color: #0f172a; }
+    body.light-mode .btn-save { background: #1d4ed8; color: #ffffff; box-shadow: 0 4px 12px rgba(29,78,216,0.25); border-radius: 6px; }
+    body.light-mode .btn-save:hover { background: #1e3a8a; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(29,78,216,0.3); }
+    body.light-mode .btn-back { background: #f8fafc; border: 1px solid #cbd5e1; color: #475569; border-radius: 6px; }
+    body.light-mode .btn-back:hover { background: #f1f5f9; color: #0f172a; border-color: #94a3b8; }
+  </style>
+</head>
+<body class="dashboard-dark">
+  <nav class="top-nav">
+    <div class="nav-container">
+      <div class="nav-left">
+        <h2><i class="fas fa-dumbbell"></i> Royal Gym</h2>
+      </div>
+      <div class="nav-center"></div>
+      <div class="nav-right">
+        <button class="btn btn-danger" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="main-content">
+    <div class="edit-container">
+      <div class="edit-card">
+        <h2><i class="fas fa-user-edit"></i>Edit Profile</h2>
+        <p class="sub">Update your personal details below.</p>
+
+        <form id="editProfileForm" novalidate>
+          <div class="form-grid">
+            <div class="form-group form-full">
+              <label for="fullName">Full Name</label>
+              <input type="text" id="fullName" placeholder="Your full name">
+            </div>
+            <div class="form-group form-full">
+              <label for="email">Email Address <span style="font-size:0.72rem;color:rgba(255,255,255,0.35);font-weight:400;margin-left:6px;"><i class="fas fa-lock"></i> Cannot be changed</span></label>
+              <input type="email" id="email" placeholder="you@example.com" readonly style="opacity:0.5;cursor:not-allowed;background:rgba(255,255,255,0.02);">
+            </div>
+            <div class="form-group">
+              <label for="gender">Gender</label>
+              <select id="gender">
+                <option value="">Select gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="age">Age</label>
+              <input type="number" id="age" placeholder="25" min="18" max="100">
+            </div>
+            <div class="form-group">
+              <label for="city">City</label>
+              <input type="text" id="city" placeholder="Colombo">
+            </div>
+            <div class="form-group">
+              <label for="phone">Phone</label>
+              <input type="tel" id="phone" placeholder="+94 77 000 0000">
+            </div>
+            <div class="form-group form-full">
+              <label for="address">Address</label>
+              <input type="text" id="address" placeholder="123 Main Street, Colombo">
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn-back" onclick="goBack()"><i class="fas fa-arrow-left"></i> Back</button>
+            <button type="submit" class="btn-save"><i class="fas fa-save"></i> Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+  <script src="/JS/member-edit-details.js"></script>
+</body>
+</html>

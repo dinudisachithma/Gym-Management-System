@@ -1,0 +1,172 @@
+.attendance-grid {
+    display: grid;
+    grid-template-columns: 370px minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+}
+
+.attendance-stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.attendance-blue {
+    background: linear-gradient(135deg, rgba(56,189,248,0.95), rgba(14,165,233,0.7));
+    box-shadow: 0 4px 16px rgba(56,189,248,0.3);
+}
+
+.attendance-indigo {
+    background: linear-gradient(135deg, rgba(59,130,246,0.95), rgba(67,56,202,0.7));
+    box-shadow: 0 4px 16px rgba(59,130,246,0.3);
+}
+
+.checkin-panel {
+    display: grid;
+    gap: 10px;
+}
+
+.checkin-panel label {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+}
+
+.checkin-panel input {
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(0,0,0,0.3);
+    color: #f0f9ff;
+    padding: 11px 14px;
+    font-size: 0.92rem;
+}
+
+.checkin-panel input:focus {
+    outline: none;
+    border-color: rgba(56,189,248,0.7);
+    box-shadow: 0 0 0 3px rgba(56,189,248,0.15);
+}
+
+.checkin-help {
+    color: rgba(255,255,255,0.45);
+    font-size: 0.78rem;
+    margin-top: 2px;
+}
+
+.checkin-btn {
+    width: 100%;
+    margin-top: 4px;
+    padding: 12px 18px;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    border: none;
+    border-radius: 10px;
+    color: #0c1222;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 14px rgba(245,158,11,0.25);
+}
+
+.checkin-btn:hover {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgba(245,158,11,0.35);
+}
+
+.attendance-table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.attendance-table tbody td {
+    font-size: 0.85rem;
+}
+
+.status-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.74rem;
+    font-weight: 700;
+}
+
+.status-active {
+    color: #38bdf8;
+    border: 1px solid rgba(56,189,248,0.35);
+    background: rgba(56,189,248,0.14);
+}
+
+.status-out {
+    color: #34d399;
+    border: 1px solid rgba(52,211,153,0.35);
+    background: rgba(52,211,153,0.12);
+}
+
+.table-action-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.mini-btn {
+    border: 0;
+    border-radius: 8px;
+    padding: 5px 10px;
+    font-size: 0.74rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.mini-btn.out-btn {
+    color: #d1fae5;
+    background: rgba(16,185,129,0.25);
+    border: 1px solid rgba(16,185,129,0.45);
+}
+
+.mini-btn.delete-btn {
+    color: #fecaca;
+    background: rgba(239,68,68,0.18);
+    border: 1px solid rgba(239,68,68,0.4);
+}
+
+.mini-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+@media (max-width: 1100px) {
+    .attendance-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ========================================
+   LIGHT MODE OVERRIDES — admin-attendance-record.css
+   ======================================== */
+body.light-mode .checkin-panel label { color: #475569; }
+body.light-mode .checkin-panel input {
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    color: #0f172a;
+}
+body.light-mode .checkin-panel input:focus {
+    border-color: rgba(56,189,248,0.6);
+    box-shadow: 0 0 0 3px rgba(56,189,248,0.12);
+}
+body.light-mode .checkin-help { color: #94a3b8; }
+
+body.light-mode .mini-btn.out-btn {
+    color: #065f46;
+    background: rgba(16,185,129,0.12);
+    border: 1px solid rgba(16,185,129,0.35);
+}
+body.light-mode .mini-btn.delete-btn {
+    color: #991b1b;
+    background: rgba(239,68,68,0.1);
+    border: 1px solid rgba(239,68,68,0.3);
+}

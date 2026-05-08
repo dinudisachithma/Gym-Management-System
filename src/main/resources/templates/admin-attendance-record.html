@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Attendance Record | Royal Gym</title>
+  <link rel="stylesheet" href="/CSS/corporate-style.css">
+  <link rel="stylesheet" href="/CSS/dashboard-styles.css">
+  <link rel="stylesheet" href="/CSS/admin-attendance-record.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="dashboard-dark">
+  <nav class="top-nav">
+    <div class="nav-container">
+      <div class="nav-left">
+        <h2><i class="fas fa-dumbbell"></i> Royal Gym</h2>
+      </div>
+      <div class="nav-center">
+        <span style="color:rgba(56,189,248,0.85);font-size:0.88rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;">
+          <i class="fas fa-clipboard-list" style="margin-right:8px;"></i>Attendance Management
+        </span>
+      </div>
+      <div class="nav-right">
+        <button id="themeToggleBtn" class="icon-button" style="margin-right:8px; color:#a5b4fc;" onclick="toggleTheme()" title="Toggle Light/Dark Theme">
+          <i class="fas fa-moon"></i>
+        </button>
+        <button class="btn btn-danger" onclick="window.location.href='/admin-dashboard'">
+          <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Page Hero Banner -->
+  <div style="background: linear-gradient(135deg, rgba(10,16,32,0.95) 0%, rgba(20,38,80,0.9) 60%, rgba(10,16,32,0.95) 100%); border-bottom: 1px solid rgba(56,189,248,0.2); padding: 22px 0 18px; margin-bottom: 26px;">
+    <div style="max-width: 1440px; margin: 0 auto; padding: 0 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+      <div>
+        <h2 class="hero-title">
+          <i class="fas fa-calendar-check"></i> &nbsp;Attendance Record
+        </h2>
+        <p style="font-size:0.8rem;color:rgba(255,255,255,0.4);margin:0;">Track member check-ins and attendance records in real time</p>
+      </div>
+      <!-- Mini stats pills -->
+      <div style="display: flex; gap: 14px; flex-wrap: wrap;">
+        <div style="display: flex; align-items: center; gap: 10px; padding: 10px 18px; border-radius: 30px; font-size: 0.82rem; font-weight: 700; background: linear-gradient(135deg,rgba(56,189,248,0.15),rgba(14,165,233,0.06)); border: 1px solid rgba(56,189,248,0.3); color: #38bdf8;">
+          <i class="fas fa-calendar-day"></i>
+          <span id="heroTodayCheckIns" style="font-size: 1.1rem;">—</span>
+          Today's Check-ins
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px; padding: 10px 18px; border-radius: 30px; font-size: 0.82rem; font-weight: 700; background: linear-gradient(135deg,rgba(99,102,241,0.18),rgba(67,56,202,0.08)); border: 1px solid rgba(99,102,241,0.3); color: #818cf8;">
+          <i class="fas fa-list-check"></i>
+          <span id="heroTotalRecords" style="font-size: 1.1rem;">—</span>
+          Total Records
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <main class="main-content">
+    <div class="container">
+      <div class="attendance-grid">
+        <section>
+          <div class="stats-grid attendance-stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon attendance-blue"><i class="fas fa-calendar-day"></i></div>
+              <div class="stat-content">
+                <div class="stat-number" id="todayCheckIns">0</div>
+                <div class="stat-label">Today's Check-ins</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon attendance-indigo"><i class="fas fa-list-check"></i></div>
+              <div class="stat-content">
+                <div class="stat-number" id="totalAttendanceRecords">0</div>
+                <div class="stat-label">Total Records</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3><i class="fas fa-right-to-bracket"></i> Check In Member</h3>
+            </div>
+            <div class="card-body">
+              <div class="checkin-panel">
+                <label for="memberIdInput">Member ID</label>
+                <input id="memberIdInput" type="text" placeholder="e.g. GYM-001 or M001">
+                <button class="btn btn-primary checkin-btn" onclick="checkInMember()">
+                  <i class="fas fa-right-to-bracket"></i> Check In
+                </button>
+                <p class="checkin-help">Tip: IDs like <b>M001</b>, <b>001</b> and <b>GYM-001</b> are supported.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <div class="card">
+            <div class="card-header attendance-table-header">
+              <h3><i class="fas fa-table-list"></i> Attendance Records</h3>
+              <div class="member-toolbar-controls" style="flex:1; justify-content:center; margin:0 20px;">
+                <div class="member-search-wrap" style="min-width:300px; background:rgba(255,255,255,0.03);">
+                  <i class="fas fa-search"></i>
+                  <input type="text" id="attendanceSearchInput" placeholder="Search by ID or Email..." onkeyup="filterAttendanceTable()">
+                </div>
+              </div>
+              <button class="btn btn-secondary btn-sm" onclick="loadAttendanceData()"><i class="fas fa-rotate"></i> Refresh</button>
+            </div>
+            <div class="card-body">
+              <div class="table-container">
+                <table class="data-table attendance-table">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Member ID</th>
+                      <th>Name</th>
+                      <th>Date</th>
+                      <th>Check-in</th>
+                      <th>Check-out</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="attendanceTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <script src="/JS/custom-alerts.js"></script>
+  <script src="/JS/admin-attendance-record.js"></script>
+  <script>
+    if (localStorage.getItem('theme') === 'light') {
+      document.body.classList.add('light-mode');
+    }
+    window.addEventListener('DOMContentLoaded', () => {
+      const btn = document.getElementById('themeToggleBtn');
+      if (btn && document.body.classList.contains('light-mode')) {
+        btn.innerHTML = '<i class="fas fa-sun"></i>';
+        btn.style.color = '#fcd34d';
+        btn.style.background = 'rgba(245,158,11,0.15)';
+        btn.style.borderColor = 'rgba(245,158,11,0.4)';
+      }
+    });
+    function toggleTheme() {
+      const body = document.body;
+      const btn = document.getElementById('themeToggleBtn');
+      body.classList.toggle('light-mode');
+      if (body.classList.contains('light-mode')) {
+        localStorage.setItem('theme', 'light');
+        btn.innerHTML = '<i class="fas fa-sun"></i>';
+        btn.style.color = '#fcd34d';
+        btn.style.background = 'rgba(245,158,11,0.15)';
+        btn.style.borderColor = 'rgba(245,158,11,0.4)';
+      } else {
+        localStorage.setItem('theme', 'dark');
+        btn.innerHTML = '<i class="fas fa-moon"></i>';
+        btn.style.color = '#a5b4fc';
+        btn.style.background = 'rgba(255,255,255,0.05)';
+        btn.style.borderColor = 'rgba(255,255,255,0.08)';
+      }
+    }
+  </script>
+</body>
+</html>

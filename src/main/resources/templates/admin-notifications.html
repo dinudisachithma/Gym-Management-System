@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Notifications | Royal Gym</title>
+  <link rel="stylesheet" href="/CSS/corporate-style.css?v=3">
+  <link rel="stylesheet" href="/CSS/dashboard-styles.css?v=3">
+  <link rel="stylesheet" href="/CSS/admin-notifications.css?v=3">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css?v=3">
+</head>
+<body class="dashboard-dark">
+
+  <nav class="top-nav">
+    <div class="nav-container">
+      <div class="nav-left">
+        <h2><i class="fas fa-dumbbell"></i> Royal Gym</h2>
+      </div>
+      <div class="nav-center"></div>
+      <div class="nav-right">
+        <button id="themeToggleBtn" class="icon-button" style="margin-right:8px; color:#a5b4fc;" onclick="toggleTheme()" title="Toggle Light/Dark Theme">
+          <i class="fas fa-moon"></i>
+        </button>
+        <button id="focusModeBtn" class="icon-button" style="margin-right:20px; color:#38bdf8;" onclick="toggleFocusMode()" title="Toggle Focus Mode">
+          <i class="fas fa-expand-arrows-alt"></i>
+        </button>
+        <button class="btn btn-danger" onclick="window.location.href='/admin-dashboard'">
+          <i class="fas fa-arrow-left"></i> Dashboard
+        </button>
+      </div>
+    </div>
+  </nav>
+  <!-- Page Hero -->
+  <div style="background: linear-gradient(135deg, rgba(10,16,32,0.95) 0%, rgba(20,38,80,0.9) 60%, rgba(10,16,32,0.95) 100%); border-bottom: 1px solid rgba(56,189,248,0.2); padding: 22px 0 18px; margin-bottom: 26px;">
+    <div style="max-width: 1440px; margin: 0 auto; padding: 0 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+      <div>
+        <h2 class="hero-title">
+          <i class="fas fa-bell"></i> &nbsp;Admin Notifications
+        </h2>
+        <p style="font-size:0.8rem;color:rgba(255,255,255,0.4);margin:0;">Broadcast alerts and manage recent communications</p>
+      </div>
+      <!-- Mini stats bar -->
+      <div style="display: flex; gap: 14px; flex-wrap: wrap;">
+        <div style="display: flex; align-items: center; gap: 10px; padding: 10px 18px; border-radius: 30px; font-size: 0.82rem; font-weight: 700; background: linear-gradient(135deg,rgba(56,189,248,0.15),rgba(14,165,233,0.06)); border: 1px solid rgba(56,189,248,0.3); color: #38bdf8;">
+          <i class="fas fa-paper-plane"></i> Instant Broadcast
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <main class="main-content">
+    <div class="container">
+      <div class="notif-layout">
+        <!-- Left: Send Notification -->
+        <section class="notif-send-col">
+          <div class="notif-card">
+            <div class="notif-card-header">
+              <h3><i class="fas fa-paper-plane"></i> Send Notification</h3>
+            </div>
+            <div class="notif-card-body">
+              <div class="form-group">
+                <label for="notifTitle">Title</label>
+                <input id="notifTitle" type="text" placeholder="Enter notification title">
+              </div>
+
+              <div class="form-group">
+                <label for="notifMessage">Message</label>
+                <textarea id="notifMessage" rows="4" placeholder="Enter your notification message"></textarea>
+              </div>
+
+              <div class="notif-grid-2">
+                <div class="form-group">
+                  <label for="notifType">Type</label>
+                  <select id="notifType">
+                    <option value="INFO">Info</option>
+                    <option value="ALERT">Alert</option>
+                    <option value="ANNOUNCEMENT">Announcement</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="notifSenderName">Sent By</label>
+                  <input id="notifSenderName" type="text" placeholder="e.g. admin">
+                </div>
+              </div>
+
+              <div class="notif-grid-2">
+                <div class="form-group">
+                  <label for="notifTargetScope">Target</label>
+                  <select id="notifTargetScope" onchange="onTargetScopeChange()">
+                    <option value="ALL">All</option>
+                    <option value="ALL_MEMBERS">All Members</option>
+                    <option value="ALL_TRAINERS">All Trainers</option>
+                    <option value="SINGLE_MEMBER">Single Member</option>
+                    <option value="SINGLE_TRAINER">Single Trainer</option>
+                  </select>
+                </div>
+
+                <div class="form-group" id="singleMemberWrap" style="display:none;">
+                  <label for="notifMemberSelect">Member</label>
+                  <select id="notifMemberSelect" onchange="onSingleMemberChanged()">
+                    <option value="">Select member...</option>
+                  </select>
+                </div>
+
+                <div class="form-group" id="singleTrainerWrap" style="display:none;">
+                  <label for="notifTrainerSelect">Trainer</label>
+                  <select id="notifTrainerSelect" onchange="onSingleTrainerChanged()">
+                    <option value="">Select trainer...</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="notif-single-meta" id="notifSingleMeta" style="margin-top:2px; margin-bottom:12px; display:none;">
+                <div class="notif-grid-2">
+                  <div class="form-group" style="margin-bottom:0;">
+                    <label for="notifMemberNameDisplay">Member Name</label>
+                    <input id="notifMemberNameDisplay" type="text" disabled>
+                  </div>
+                  <div class="form-group" style="margin-bottom:0;">
+                    <label for="notifMemberEmailDisplay">Member Email</label>
+                    <input id="notifMemberEmailDisplay" type="text" disabled>
+                  </div>
+                </div>
+              </div>
+
+              <div class="notif-single-meta" id="notifTrainerSingleMeta" style="margin-top:2px; margin-bottom:12px; display:none;">
+                <div class="notif-grid-2">
+                  <div class="form-group" style="margin-bottom:0;">
+                    <label for="notifTrainerNameDisplay">Trainer Name</label>
+                    <input id="notifTrainerNameDisplay" type="text" disabled>
+                  </div>
+                  <div class="form-group" style="margin-bottom:0;">
+                    <label for="notifTrainerEmailDisplay">Trainer Email</label>
+                    <input id="notifTrainerEmailDisplay" type="text" disabled>
+                  </div>
+                </div>
+              </div>
+
+              <button class="notif-send-btn" onclick="sendNotification()">
+                <i class="fas fa-bell"></i> Send Notification
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Right: Feed -->
+        <section class="notif-feed-col">
+          <div class="notif-feed-top">
+            <h3 class="notif-feed-title"><i class="fas fa-list"></i> Notification Feed</h3>
+            <div class="notif-filters">
+              <button class="filter-btn active" data-filter="all" onclick="loadNotificationFeed('all')">All</button>
+              <button class="filter-btn" data-filter="unread" onclick="loadNotificationFeed('unread')">Unread</button>
+              <button class="filter-btn" data-filter="member" onclick="loadNotificationFeed('member')">Member</button>
+              <button class="filter-btn" data-filter="trainer" onclick="loadNotificationFeed('trainer')">Trainers</button>
+            </div>
+          </div>
+
+          <div id="notifFeed" class="notif-feed"></div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <script src="/JS/custom-alerts.js?v=2"></script>
+  <script src="/JS/admin-notifications.js?v=2"></script>
+</body>
+</html>
+

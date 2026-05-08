@@ -1,0 +1,235 @@
+/* Login | Royal Gym – split layout, dark form, gym image left */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+    height: 100%;
+    font-family: 'Source Sans 3', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #0c1222;
+    color: #f0f9ff;
+    overflow-x: hidden;
+}
+body { min-height: 100vh; display: flex; }
+.login-split {
+    display: flex;
+    justify-content: flex-end;
+    min-height: 100vh;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+}
+/* Left: gym image + overlay */
+.login-visual {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background: url('https://images.unsplash.com/photo-1576678927484-cc907957088c?w=1200') center/cover no-repeat;
+    z-index: 1;
+}
+.login-visual::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(12,18,34,0.88) 0%, rgba(245,158,11,0.12) 100%);
+    z-index: 1;
+}
+.login-visual-content {
+    position: absolute;
+    bottom: 60px;
+    left: 48px;
+    right: 50%;
+    z-index: 2;
+}
+.login-visual h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 12px;
+    line-height: 1.2;
+}
+.login-visual p {
+    color: rgba(255,255,255,0.85);
+    font-size: 1rem;
+    line-height: 1.5;
+}
+/* Right: form panel */
+.login-form-panel {
+    width: 45%;
+    min-width: 450px;
+    padding: 56px 8%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: linear-gradient(180deg, rgba(12,18,34,0.92) 0%, rgba(15,23,42,0.95) 50%, rgba(10,15,26,0.95) 100%);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-left: 1px solid rgba(255,255,255,0.08);
+    box-shadow: -8px 0 30px rgba(0,0,0,0.5);
+    position: relative;
+    z-index: 10;
+    will-change: transform, opacity;
+    animation: slideInDrawer 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideInDrawer {
+    from {
+        opacity: 0;
+        transform: translateX(150px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+.login-form-panel .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 32px;
+}
+.login-form-panel .logo i {
+    font-size: 1.75rem;
+    color: #f59e0b;
+}
+.login-form-panel .logo h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #fff;
+}
+.login-form-panel h3 {
+    color: #fff;
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+.login-form-panel .sub {
+    color: rgba(255,255,255,0.65);
+    font-size: 0.95rem;
+    margin-bottom: 28px;
+}
+.form-group { margin-bottom: 20px; }
+.form-group label {
+    display: block;
+    color: rgba(255,255,255,0.9);
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+}
+.input-wrap { position: relative; }
+.input-wrap > i:first-of-type {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255,255,255,0.45);
+    font-size: 1rem;
+    pointer-events: none;
+}
+.input-wrap input {
+    width: 100%;
+    padding: 14px 44px 14px 44px;
+    background: rgba(30,41,59,0.7);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 1rem;
+    transition: border-color 0.35s ease, box-shadow 0.35s ease, background-color 0.35s ease;
+}
+.input-wrap input::placeholder { color: rgba(255,255,255,0.4); }
+.input-wrap input:focus {
+    outline: none;
+    border-color: #38bdf8;
+    box-shadow: 0 0 0 2px rgba(56,189,248,0.22);
+}
+.input-wrap .pwtoggle {
+    position: absolute;
+    right: 14px;
+    left: auto;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: rgba(255,255,255,0.5);
+    font-size: 0.9rem;
+}
+.input-wrap .pwtoggle:hover { color: #f59e0b; }
+.checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 24px;
+}
+.checkbox-row input { width: auto; accent-color: #f59e0b; }
+.checkbox-row label { margin: 0; color: rgba(255,255,255,0.75); font-size: 0.9rem; }
+.btn-login {
+    width: 100%;
+    padding: 14px 20px;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: #0c1222;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.35s ease;
+    box-shadow: 0 4px 16px rgba(245,158,11,0.35);
+}
+.btn-login:hover {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 22px rgba(245,158,11,0.5);
+}
+.auth-footer { margin-top: 24px; text-align: center; }
+.auth-footer p { color: rgba(255,255,255,0.65); font-size: 0.9rem; }
+.auth-footer a { color: #f59e0b; text-decoration: none; font-weight: 500; }
+.auth-footer a:hover { text-decoration: underline; }
+.back-link {
+    display: block;
+    margin-top: 12px;
+    color: rgba(255,255,255,0.5) !important;
+    font-size: 0.85rem !important;
+}
+.back-link:hover { color: #f59e0b !important; }
+.error-message { color: #f87171; font-size: 0.85rem; margin-top: 6px; display: none; }
+@media (max-width: 900px) {
+    .login-visual { display: none; }
+    .login-form-panel { width: 100%; min-width: 0; padding: 48px 32px; }
+    .calendar-widget { display: none; /* hide on narrow mobile flows */ }
+}
+@media (max-width: 600px) {
+    .login-form-panel { padding: 32px 20px; }
+}
+
+/* Calendar Widget */
+.calendar-widget {
+    position: absolute;
+    top: 40px;
+    right: 48px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    width: 65px;
+    height: 65px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+#calMonth {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #f59e0b;
+    letter-spacing: 0.08em;
+    margin-bottom: 2px;
+}
+#calDate {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1;
+}

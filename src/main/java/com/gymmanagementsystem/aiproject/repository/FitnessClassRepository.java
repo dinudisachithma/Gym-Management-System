@@ -1,9 +1,10 @@
 package com.gymmanagementsystem.aiproject.repository;
 
 import com.gymmanagementsystem.aiproject.model.FitnessClass;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.mongodb.repository.MongoRepository;
+import java.util.List;
 
-@Repository
-public interface FitnessClassRepository extends JpaRepository<FitnessClass, String> {
+public interface FitnessClassRepository extends MongoRepository<FitnessClass, String> {
+    List<FitnessClass> findByTrainerId(String trainerId);
+    List<FitnessClass> findByMemberIdsContaining(String memberId);
 }
