@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment Portal | Royal Gym</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      min-height: 100vh; display: flex;
+      align-items: center; justify-content: center;
+      padding: 24px; color: #f0f9ff;
+      background: linear-gradient(135deg, rgba(10,16,32,1) 0%, rgba(20,35,70,1) 50%, rgba(10,16,32,1) 100%);
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      font-family: 'Inter', sans-serif;
+    }
+    .pay-wrapper {
+      display: flex; gap: 28px; max-width: 860px; width: 100%;
+      animation: fadeUp 0.5s ease both;
+    }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+
+    /* ── Order Summary ── */
+    .order-summary {
+      width: 280px; flex-shrink: 0;
+      background: #121a2a;
+      border: 1px solid rgba(56,189,248,0.12);
+      border-radius: 16px; padding: 28px 24px;
+    }
+    .gym-logo { display:flex; align-items:center; gap:10px; font-size:1.1rem; font-weight:700; color:#fff; margin-bottom:28px; }
+    .gym-logo i { color: #38bdf8; }
+    .summary-label { font-size:.75rem; font-weight:600; text-transform:uppercase; letter-spacing:.08em; color:rgba(255,255,255,0.4); margin-bottom:8px; }
+    .summary-pkg { font-size:1.05rem; font-weight:600; color:#fff; margin-bottom:4px; }
+    .summary-duration { font-size:.85rem; color:rgba(255,255,255,0.45); margin-bottom:24px; }
+    .summary-divider { border:none; border-top:1px solid rgba(255,255,255,0.08); margin:20px 0; }
+    .summary-row { display:flex; justify-content:space-between; font-size:.88rem; color:rgba(255,255,255,0.55); margin-bottom:8px; }
+    .summary-row.total { font-size:1.05rem; font-weight:700; color:#fff; margin-top:12px; }
+    .summary-features { list-style:none; padding:0; margin:16px 0 0; }
+    .summary-features li { display:flex; align-items:center; gap:8px; font-size:.83rem; color:rgba(255,255,255,0.5); padding:5px 0; }
+    .summary-features li i { color:#10b981; font-size:.7rem; }
+    .secure-badge { display:flex; align-items:center; gap:6px; font-size:.78rem; color:rgba(255,255,255,0.3); margin-top:28px; }
+    .secure-badge i { color:#10b981; }
+
+    /* ── Card Form ── */
+    .pay-card {
+      flex:1; background:#121a2a;
+      border:1px solid rgba(56,189,248,0.12);
+      border-radius:16px; padding:32px 28px;
+    }
+    .pay-card h2 { font-size:1.15rem; font-weight:600; color:#fff; margin-bottom:6px; }
+    .pay-card .sub { font-size:.85rem; color:rgba(255,255,255,0.4); margin-bottom:28px; }
+
+    /* Visual card */
+    .card-visual {
+      background: linear-gradient(135deg, #1a3a5c 0%, #0e2440 50%, #1a4060 100%);
+      border-radius:14px; padding:22px 24px; margin-bottom:28px;
+      position:relative; overflow:hidden;
+      border:1px solid rgba(56,189,248,0.2);
+    }
+    .card-visual::before { content:''; position:absolute; top:-30px; right:-30px; width:160px; height:160px; background:rgba(56,189,248,0.07); border-radius:50%; }
+    .card-visual::after { content:''; position:absolute; bottom:-50px; right:40px; width:120px; height:120px; background:rgba(56,189,248,0.04); border-radius:50%; }
+    .card-chip { width:36px; height:28px; background:linear-gradient(135deg,#fcd34d,#f59e0b); border-radius:5px; margin-bottom:20px; position:relative; z-index:1; }
+    .card-number-display { font-size:1.2rem; letter-spacing:.2em; color:#fff; font-weight:500; margin-bottom:18px; font-family:'Courier New',monospace; position:relative; z-index:1; }
+    .card-bottom { display:flex; justify-content:space-between; align-items:flex-end; position:relative; z-index:1; }
+    .card-bottom .card-label { font-size:.65rem; text-transform:uppercase; letter-spacing:.1em; color:rgba(255,255,255,0.6); margin-bottom:2px; }
+    .card-bottom .card-val { font-size:.88rem; color:#fff; font-weight:500; }
+    .card-brand-icon { font-size:1.8rem; color:rgba(255,255,255,0.85); }
+
+    /* Form fields */
+    .field { margin-bottom:18px; }
+    .field label { display:block; font-size:.8rem; font-weight:600; color:rgba(255,255,255,0.55); margin-bottom:7px; text-transform:uppercase; letter-spacing:.06em; }
+    .field input { width:100%; padding:13px 16px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:9px; color:#fff; font-size:.95rem; font-family:'Inter',sans-serif; outline:none; transition:border-color .2s,box-shadow .2s; }
+    .field input::placeholder { color:rgba(255,255,255,0.2); }
+    .field input:focus { border-color:#38bdf8; box-shadow:0 0 0 3px rgba(56,189,248,0.15); }
+    .field input.error { border-color:#ef4444; box-shadow:0 0 0 3px rgba(239,68,68,0.15); }
+    .field input.valid { border-color:#10b981; box-shadow:0 0 0 3px rgba(16,185,129,0.15); }
+    .field-row { display:flex; gap:14px; }
+    .field-row .field { flex:1; }
+    .error-msg { font-size:.78rem; color:#ef4444; margin-top:5px; display:none; }
+    .error-msg.show { display:block; }
+
+    .pay-btn {
+      width:100%; padding:15px; background:linear-gradient(135deg,#38bdf8,#0ea5e9);
+      color:#0a1020; border:none; border-radius:10px; font-size:1rem; font-weight:700;
+      cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px;
+      margin-top:24px; transition:opacity .2s,transform .15s,box-shadow .2s;
+      box-shadow:0 4px 20px rgba(56,189,248,0.3); letter-spacing:.02em;
+    }
+    .pay-btn:hover:not(:disabled) { opacity:.9; transform:translateY(-1px); box-shadow:0 6px 28px rgba(56,189,248,0.4); }
+    .pay-btn:disabled { opacity:.6; cursor:not-allowed; transform:none; }
+    .pay-btn.processing { background:linear-gradient(135deg,#10b981,#059669); box-shadow:0 4px 20px rgba(16,185,129,0.3); }
+
+    .back-link { display:inline-flex; align-items:center; gap:6px; color:rgba(255,255,255,0.35); font-size:.82rem; text-decoration:none; margin-top:16px; transition:color .2s; }
+    .back-link:hover { color:rgba(255,255,255,0.65); text-decoration:none; }
+    .card-types { display:flex; gap:8px; margin-bottom:24px; }
+    .card-type-badge { padding:5px 12px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:6px; font-size:.75rem; color:rgba(255,255,255,0.4); font-weight:500; }
+
+    /* ── Light Mode Logic ── */
+    body.light-mode { background: #ffffff !important; color: #0f172a !important; transition: background 0.3s, color 0.3s; }
+    body.light-mode .order-summary, body.light-mode .pay-card { background: #f8fafc; border-color: #cbd5e1; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+    body.light-mode h2, body.light-mode .gym-logo, body.light-mode .summary-pkg, body.light-mode .summary-row.total { color: #0f172a !important; }
+    body.light-mode .summary-label, body.light-mode .summary-duration, body.light-mode .summary-row, body.light-mode .summary-features li, body.light-mode .pay-card .sub, body.light-mode .field label { color: #475569 !important; }
+    body.light-mode .field input { background: #ffffff; border-color: #cbd5e1; color: #0f172a; }
+    body.light-mode .field input:focus { border-color: #38bdf8; }
+    body.light-mode .back-link { color: #94a3b8; }
+    body.light-mode .back-link:hover { color: #0f172a; }
+
+    @media(max-width:680px) { .pay-wrapper { flex-direction:column; } .order-summary { width:100%; } }
+  </style>
+</head>
+<body class="dashboard-dark">
+  <div class="pay-wrapper">
+
+    <!-- Order Summary -->
+    <div class="order-summary">
+      <div class="gym-logo">
+        <i class="fas fa-dumbbell"></i> Royal Gym
+      </div>
+      <div class="summary-label">Membership Package</div>
+      <div class="summary-pkg" id="summaryPkg">—</div>
+      <div class="summary-duration" id="summaryDuration">—</div>
+
+      <hr class="summary-divider">
+
+      <div class="summary-row"><span>Subtotal</span><span id="summarySubtotal">Rs. —</span></div>
+      <div class="summary-row"><span>Tax</span><span>Rs. 0</span></div>
+      <div class="summary-row total"><span>Total</span><span id="summaryTotal">Rs. —</span></div>
+
+      <ul class="summary-features" id="summaryFeatures">
+        <li><i class="fas fa-check-circle"></i> 24/7 Gym Access</li>
+        <li><i class="fas fa-check-circle"></i> Basic Equipment</li>
+        <li><i class="fas fa-check-circle"></i> Locker Room Access</li>
+      </ul>
+
+      <div class="summary-divider" style="margin-top:20px;"></div>
+      <div class="secure-badge">
+        <i class="fas fa-lock"></i> Secure 256-bit SSL Encryption
+      </div>
+    </div>
+
+    <!-- Payment Section -->
+    <div class="pay-card">
+      <h2>Provide Payment Details</h2>
+      <p class="sub">Complete your transaction to activate your membership.</p>
+
+      <div class="card-visual">
+        <div class="card-chip"></div>
+        <div class="card-number-display" id="cardDisplay">**** **** **** ****</div>
+        <div class="card-bottom">
+          <div>
+            <div class="card-label">Cardholder Name</div>
+            <div class="card-val" id="holderDisplay">YOUR NAME</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="card-label">Expires</div>
+            <div class="card-val" id="expiryDisplay">MM/YY</div>
+          </div>
+          <div class="card-brand-icon"><i class="fab fa-cc-visa" id="cardBrandIcon"></i></div>
+        </div>
+      </div>
+
+      <div style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.05em; color:rgba(255,255,255,0.4); margin-bottom:10px; font-weight:600;">Accepted Methods</div>
+      <div class="card-types">
+        <span class="card-type-badge"><i class="fab fa-cc-visa"></i> Visa</span>
+        <span class="card-type-badge"><i class="fab fa-cc-mastercard"></i> Mastercard</span>
+        <span class="card-type-badge"><i class="fab fa-cc-amex"></i> Amex</span>
+      </div>
+
+      <form id="payForm" novalidate>
+        <!-- Cardholder Name -->
+        <div class="field">
+          <label for="cardName">Cardholder Name</label>
+          <input type="text" id="cardName" placeholder="John Silva" autocomplete="cc-name" maxlength="60">
+          <div class="error-msg" id="errName">Cardholder name must contain only letters, spaces, hyphens, and apostrophes.</div>
+        </div>
+
+        <!-- Card Number -->
+        <div class="field">
+          <label for="cardNumber">Card Number</label>
+          <input type="text" id="cardNumber" placeholder="0000 0000 0000 0000" maxlength="19" autocomplete="cc-number"
+            inputmode="numeric">
+          <div class="error-msg" id="errNumber">Please enter a valid 16-digit card number.</div>
+        </div>
+
+        <!-- Expiry + CVV -->
+        <div class="field-row">
+          <div class="field">
+            <label for="cardExpiry">Expiry Date</label>
+            <input type="text" id="cardExpiry" placeholder="MM/YY" maxlength="5" autocomplete="cc-exp"
+              inputmode="numeric">
+            <div class="error-msg" id="errExpiry">Please enter a valid expiry (MM/YY).</div>
+          </div>
+          <div class="field">
+            <label for="cardCvv">CVV</label>
+            <input type="password" id="cardCvv" placeholder="•••" maxlength="4" autocomplete="cc-csc"
+              inputmode="numeric">
+            <div class="error-msg" id="errCvv">Please enter a valid CVV.</div>
+          </div>
+        </div>
+
+        <button type="submit" class="pay-btn" id="payBtn">
+          <i class="fas fa-lock"></i>
+          <span id="payBtnText">Pay Now</span>
+        </button>
+      </form>
+
+      <a href="/member-dashboard" class="back-link">
+        <i class="fas fa-arrow-left"></i> Back to dashboard
+      </a>
+    </div>
+  </div>
+
+  <script>
+    // ── Read URL params ──
+    const params = new URLSearchParams(window.location.search);
+    const pkg = params.get('package') || '';
+    const amount = parseFloat(params.get('amount')) || 0;
+    const email = params.get('email') || '';
+
+    const pkgMeta = {
+      monthly: { name: 'Monthly', duration: '1 Month', features: ['24/7 Gym Access', 'Basic Equipment', 'Locker Room Access', 'Flexible monthly commitment'] },
+      quarterly: { name: 'Quarterly', duration: '3 Months', features: ['24/7 Gym Access', 'Group Classes Access', 'Better Value', 'Rs. 3,167/month effective'] },
+      annually: { name: 'Annually', duration: '12 Months', features: ['Everything in Quarterly', 'Best value for money', 'Rs. 2,667/month effective', 'Priority Support'] }
+    };
+    const meta = pkgMeta[pkg] || { name: pkg || '—', duration: '—', features: [] };
+
+    // Populate summary
+    document.getElementById('summaryPkg').textContent = meta.name + ' Membership';
+    document.getElementById('summaryDuration').textContent = meta.duration;
+    const amtFmt = amount ? 'Rs. ' + amount.toLocaleString() : 'Rs. —';
+    document.getElementById('summarySubtotal').textContent = amtFmt;
+    document.getElementById('summaryTotal').textContent = amtFmt;
+    document.getElementById('payBtnText').textContent = 'Pay ' + amtFmt;
+    if (meta.features.length) {
+      document.getElementById('summaryFeatures').innerHTML =
+        meta.features.map(f => '<li><i class="fas fa-check-circle"></i> ' + f + '</li>').join('');
+    }
+
+    // ── Card number formatting & preview ──
+    const cardNumberInput = document.getElementById('cardNumber');
+    const cardDisplay = document.getElementById('cardDisplay');
+    const cardBrand = document.getElementById('cardBrandIcon');
+
+    cardNumberInput.addEventListener('input', function () {
+      this.value = this.value.replace(/\D/g, '').replace(/(.{4})/g, '$1 ').trim().slice(0, 19);
+      const raw = this.value.replace(/\s/g, '');
+      
+      let maskedRaw = '';
+      for (let i = 0; i < raw.length; i++) {
+        maskedRaw += (i < 12) ? '*' : raw[i];
+      }
+      
+      const parts = (maskedRaw + '****************').slice(0, 16);
+      cardDisplay.textContent = parts.replace(/(.{4})/g, '$1 ').trim();
+      // Detect brand
+      if (raw.startsWith('4')) cardBrand.className = 'fab fa-cc-visa';
+      else if (/^5[1-5]/.test(raw) || /^2[2-7]/.test(raw)) cardBrand.className = 'fab fa-cc-mastercard';
+      else if (/^3[47]/.test(raw)) cardBrand.className = 'fab fa-cc-amex';
+      else cardBrand.className = 'fas fa-credit-card';
+    });
+
+    // ── Cardholder name live validation & preview ──
+    document.getElementById('cardName').addEventListener('input', function () {
+      // Filter non-alphabetical characters (allow letters, spaces, hyphens, and apostrophes)
+      const originalValue = this.value;
+      const cleanValue = originalValue.replace(/[^a-zA-Z\s\-']/g, '');
+      
+      if (originalValue !== cleanValue) {
+        this.value = cleanValue;
+      }
+      
+      // Update preview immediately
+      document.getElementById('holderDisplay').textContent = this.value.toUpperCase() || 'YOUR NAME';
+      
+      // Live tracking validation using existing showErr helper
+      const name = this.value.trim();
+      const nameRegex = /^[a-zA-Z\s\-']+$/;
+      const isNameValid = name !== '' && nameRegex.test(name);
+      
+      // If user clears the field, remove validation classes, otherwise show valid state
+      if (name === '') {
+        showErr('errName', false);
+        this.classList.remove('valid', 'error');
+      } else {
+        showErr('errName', !isNameValid);
+      }
+    });
+
+    // ── Expiry formatting & preview ──
+    const expiryInput = document.getElementById('cardExpiry');
+    expiryInput.addEventListener('input', function () {
+      let v = this.value.replace(/\D/g, '');
+      if (v.length >= 3) v = v.slice(0, 2) + '/' + v.slice(2, 4);
+      this.value = v;
+      document.getElementById('expiryDisplay').textContent = this.value || 'MM/YY';
+    });
+
+    // ── CVV ──
+    document.getElementById('cardCvv').addEventListener('input', function () {
+      this.value = this.value.replace(/\D/g, '');
+    });
+
+    // ── Validation ──
+    function showErr(id, show) {
+      const el = document.getElementById(id);
+      const input = el.previousElementSibling;
+      if (show) { 
+        el.classList.add('show'); 
+        input.classList.add('error'); 
+        input.classList.remove('valid');
+      } else { 
+        el.classList.remove('show'); 
+        input.classList.remove('error'); 
+        if(input.value.trim() !== '') input.classList.add('valid');
+      }
+    }
+
+    function validate() {
+      let ok = true;
+      const name = document.getElementById('cardName').value.trim();
+      const number = document.getElementById('cardNumber').value.replace(/\s/g, '');
+      const expiry = document.getElementById('cardExpiry').value;
+      const cvv = document.getElementById('cardCvv').value;
+
+      // Validate cardholder name: only letters, spaces, hyphens, apostrophes
+      const nameRegex = /^[a-zA-Z\s\-']+$/;
+      const nameValid = name && nameRegex.test(name);
+      showErr('errName', !nameValid);
+      if (!nameValid) {
+        document.getElementById('errName').textContent = 'Cardholder name must contain only letters, spaces, hyphens, and apostrophes.';
+        ok = false;
+      }
+
+      showErr('errNumber', number.length !== 16); if (number.length !== 16) ok = false;
+      
+      let expiryValid = /^\d{2}\/\d{2}$/.test(expiry);
+      if (expiryValid) {
+        const parts = expiry.split('/');
+        const month = parseInt(parts[0], 10);
+        const year = parseInt(parts[1], 10);
+        const now = new Date();
+        const currentYear = parseInt(now.getFullYear().toString().slice(-2), 10);
+        const currentMonth = now.getMonth() + 1;
+        
+        if (month < 1 || month > 12) {
+          expiryValid = false;
+          document.getElementById('errExpiry').textContent = "Invalid month (01-12).";
+        } else if (year < currentYear || (year === currentYear && month < currentMonth)) {
+          expiryValid = false;
+          document.getElementById('errExpiry').textContent = "Card has expired.";
+        } else {
+          document.getElementById('errExpiry').textContent = "Please enter a valid expiry (MM/YY).";
+        }
+      }
+      showErr('errExpiry', !expiryValid); if (!expiryValid) ok = false;
+      
+      showErr('errCvv', cvv.length < 3); if (cvv.length < 3) ok = false;
+      return ok;
+    }
+
+    // ── Submit ──
+    document.getElementById('payForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (!validate()) return;
+      if (!email || !pkg || !amount) {
+        showUIAlert('Error', 'Missing payment details. Please go back and select a package.', false);
+        setTimeout(function() { window.location.href = '/member-dashboard'; }, 3000);
+        return;
+      }
+
+      const btn = document.getElementById('payBtn');
+      btn.disabled = true;
+      btn.classList.add('processing');
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+      // Simulate a brief processing delay before submitting
+      setTimeout(function () {
+        fetch('/api/payments/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email, packageType: pkg, amount: amount })
+        })
+          .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, data: d }; }); })
+          .then(function (result) {
+            if (result.ok) {
+              btn.innerHTML = '<i class="fas fa-check"></i> Payment Submitted!';
+              setTimeout(function () {
+                window.location.href = '/payment-success?package=' + encodeURIComponent(pkg) + '&email=' + encodeURIComponent(email);
+              }, 800);
+            } else {
+              btn.disabled = false;
+              btn.classList.remove('processing');
+              btn.innerHTML = '<i class="fas fa-lock"></i> Pay ' + amtFmt;
+              showUIAlert('Payment Failed', result.data.error || 'Unknown error. Please try again.', false);
+            }
+          })
+          .catch(function () {
+            btn.disabled = false;
+            btn.classList.remove('processing');
+            btn.innerHTML = '<i class="fas fa-lock"></i> Pay ' + amtFmt;
+            showUIAlert('Error', 'Connection failed. Is the backend running?', false);
+          });
+      }, 1800);
+    });
+  </script>
+  <script src="/JS/custom-alerts.js"></script>
+</body>
+</html>
