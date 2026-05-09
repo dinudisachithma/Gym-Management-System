@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Feedback Moderation | Royal Gym</title>
+  <link rel="stylesheet" href="/CSS/corporate-style.css">
+  <link rel="stylesheet" href="/CSS/dashboard-styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* Green-touch for tabs and card fields */
+    .card-header h3 { border-left: 3px solid #34d399; padding-left: 10px; }
+    .data-table th { color: rgba(52,211,153,0.85) !important; }
+    /* Light mode */
+    body.light-mode .admin-hero { background: linear-gradient(135deg, #0a1f4a 0%, #153a7a 60%, #0a1f4a 100%) !important; }
+    body.light-mode .card { background: #fff !important; border-bottom: 1px solid #e2e8f0 !important; border-left: 1px solid #e2e8f0 !important; border-right: 1px solid #e2e8f0 !important; }
+    body.light-mode .card-header { background: linear-gradient(90deg, rgba(16,185,129,0.08), transparent) !important; border-bottom: 1px solid rgba(16,185,129,0.15) !important; }
+    body.light-mode .card-header h3 { color: #0f172a !important; }
+    body.light-mode .data-table th { color: #059669 !important; background: rgba(16,185,129,0.06) !important; }
+    body.light-mode .data-table td { color: #1e293b !important; }
+    body.light-mode .data-table tbody tr:hover { background: rgba(16,185,129,0.05) !important; }
+    body.light-mode #statusFilter { background: #fff !important; border: 1px solid #cbd5e1 !important; color: #0f172a !important; }
+  </style>
+</head>
+<body class="dashboard-dark">
+  <nav class="top-nav">
+    <div class="nav-container">
+      <div class="nav-left">
+        <h2><i class="fas fa-dumbbell"></i> Royal Gym</h2>
+      </div>
+      <div class="nav-center">
+        <span style="color:rgba(245,158,11,0.85);font-size:0.88rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;">
+          <i class="fas fa-comments" style="margin-right:8px;"></i>Feedback Management
+        </span>
+      </div>
+      <div class="nav-right">
+    </div>
+  </nav>
+
+  <div class="admin-hero">
+    <div class="admin-hero-inner">
+      <div class="admin-hero-left">
+        <h2 class="hero-title">
+          <i class="fas fa-comment-dots"></i> &nbsp;Member Feedback
+        </h2>
+        <p>Review, approve, or remove member feedback and ratings</p>
+      </div>
+      <div class="admin-stats-bar">
+        <div class="admin-stat-chip gold">
+          <i class="fas fa-hourglass-half"></i>
+          <span id="heroStatPending">—</span>
+          Pending
+        </div>
+        <div class="admin-stat-chip green">
+          <i class="fas fa-check-circle"></i>
+          <span id="heroStatApproved">—</span>
+          Approved
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <main class="main-content" style="padding-top: 30px;">
+    <div class="container" style="max-width: 1200px;">
+      
+      <div class="card">
+        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+          <h3><i class="fas fa-clipboard-list"></i> Feedback List</h3>
+          <div>
+            <select id="statusFilter" onchange="renderFeedback()" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#fff;border-radius:7px;padding:6px 12px;font-size:0.85rem;cursor:pointer;">
+              <option value="ALL">All Feedback</option>
+              <option value="PENDING" selected>Pending Review</option>
+              <option value="APPROVED">Approved / Published</option>
+            </select>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Member</th>
+                  <th>Target</th>
+                  <th>Rating</th>
+                  <th>Comment</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="feedbackTableBody">
+                <tr><td colspan="7" style="text-align: center; color: #94a3b8; padding: 20px;">Loading feedback...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="/JS/admin-feedback.js"></script>
+  <script>
+    if (localStorage.getItem('theme') === 'light') {
+      document.body.classList.add('light-mode');
+    }
+    window.addEventListener('DOMContentLoaded', () => {
+      const btn = document.getElementById('themeToggleBtn');
+      if (btn && document.body.classList.contains('light-mode')) {
+        btn.innerHTML = '<i class="fas fa-sun"></i>';
+        btn.style.color = '#fcd34d';
+        btn.style.background = 'rgba(245,158,11,0.15)';
+        btn.style.borderColor = 'rgba(245,158,11,0.4)';
+      }
+    });
+    function toggleTheme() {
+      const body = document.body;
+      const btn = document.getElementById('themeToggleBtn');
+      body.classList.toggle('light-mode');
+      if (body.classList.contains('light-mode')) {
+        localStorage.setItem('theme', 'light');
+        btn.innerHTML = '<i class="fas fa-sun"></i>';
+        btn.style.color = '#fcd34d';
+        btn.style.background = 'rgba(245,158,11,0.15)';
+        btn.style.borderColor = 'rgba(245,158,11,0.4)';
+      } else {
+        localStorage.setItem('theme', 'dark');
+        btn.innerHTML = '<i class="fas fa-moon"></i>';
+        btn.style.color = '#a5b4fc';
+        btn.style.background = 'rgba(255,255,255,0.05)';
+        btn.style.borderColor = 'rgba(255,255,255,0.08)';
+      }
+    }
+  </script>
+</body>
+</html>
